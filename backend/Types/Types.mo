@@ -31,7 +31,6 @@ module {
         #Kitties;
         //  #Milk
     };
-
     //bidder to place a
     public type OfferData = {
         offer_id:Nat32;
@@ -39,5 +38,23 @@ module {
         amount : Nat;
         expiry_date : Int;
     };
+
+//claim funds incase of funds not transfered
+public type ClaimData={
+    id:Nat;
+    claimer:Principal;
+    amount:Nat;
+    settled:Bool;
+};
+
+
+type SaleTransaction = {
+    tokens : [TokenIndex];
+    seller : Principal;
+    price : Nat64;
+    buyer : AccountIdentifier;
+    time : Time;
+  };
+
 
 };
