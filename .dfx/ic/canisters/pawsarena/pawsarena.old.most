@@ -1,0 +1,24 @@
+// Version: 1.0.0
+type ListNFTData = ListedNFTData;
+type ListedNFTData =
+  {
+    date_of_listing : Int;
+    isConfirmed : Bool;
+    nft_canister : Text;
+    nft_category : NFT_CATEGORY;
+    nft_id : Nat32;
+    nft_price : Nat;
+    offers : [OfferData];
+    seller_identifier : Text;
+    seller_principal : Principal;
+    token_identifier : Text
+  };
+type NFT_CATEGORY = {#Kitties};
+type OfferData =
+  {amount : Nat; expiry_date : Int; offer_id : Nat32; user : Principal};
+actor {
+  stable var KITTIES_CANISTER_ID : Text;
+  stable var MARKEPTLACE_ACCOUNT_IDENTIFIER : Text;
+  stable var NftListings : [(Text, ListNFTData)];
+  stable var nftOfferCount : Nat32
+};

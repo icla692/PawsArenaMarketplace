@@ -1,0 +1,59 @@
+type ListedNFTData = record {
+  nft_id : nat32;
+  date_of_listing : int;
+  nft_price : nat;
+  offers : vec OfferData;
+  seller_principal : principal;
+  nft_canister : text;
+  token_identifier : text;
+  isConfirmed : bool;
+  nft_category : NFT_CATEGORY__1;
+  seller_identifier : text;
+};
+type NFT_CATEGORY = variant { Kitties };
+type NFT_CATEGORY__1 = variant { Kitties };
+type OfferData = record {
+  user : principal;
+  expiry_date : int;
+  offer_id : nat32;
+  amount : nat;
+};
+type Response = record {
+  status : nat16;
+  data : opt text;
+  status_text : text;
+  error_text : opt text;
+};
+type Response_1 = record {
+  status : nat16;
+  data : opt ListedNFTData;
+  status_text : text;
+  error_text : opt text;
+};
+type Response_2 = record {
+  status : nat16;
+  data : opt vec ListedNFTData;
+  status_text : text;
+  error_text : opt text;
+};
+type Response_3 = record {
+  status : nat16;
+  data : opt vec record { text; ListedNFTData };
+  status_text : text;
+  error_text : opt text;
+};
+type _anon_class_15_1 = service {
+  accept_offer : (text, nat32) -> (Response);
+  buy_nft : (text) -> (Response);
+  claim_nft : (text) -> (text);
+  complete_listing : (principal, nat, NFT_CATEGORY) -> (Response);
+  get_all_listed_nfts : () -> (Response_3) query;
+  get_all_user_listed_nfts : (principal) -> (Response_2) query;
+  get_listed_nft_details : (text) -> (Response_1) query;
+  init_list_nft : (principal, nat, NFT_CATEGORY, nat) -> (Response);
+  place_offer_on_nft : (text, nat, int) -> (Response);
+  transferNftMarketplace : (principal, text, NFT_CATEGORY) -> (bool);
+  un_list_nft : (text) -> (Response);
+  update_nft_price : (text, nat) -> (Response);
+};
+service : () -> _anon_class_15_1
