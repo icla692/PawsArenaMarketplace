@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.40f6c2d1.css",
+    "main.js": "/static/js/main.95fdee1b.js",
+    "static/media/pasback.png": "/static/media/pasback.c22783f533cc47132d1f.png",
+    "static/media/pawsarena.png": "/static/media/pawsarena.1a70126cdfa32d501063.png",
+    "index.html": "/index.html",
+    "main.40f6c2d1.css.map": "/static/css/main.40f6c2d1.css.map",
+    "main.95fdee1b.js.map": "/static/js/main.95fdee1b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.40f6c2d1.css",
+    "static/js/main.95fdee1b.js"
+  ]
+}
