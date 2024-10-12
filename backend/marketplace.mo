@@ -18,6 +18,7 @@ actor class () = this {
     type NFT_CATEGORY = Types.NFT_CATEGORY;
     type Response<T> = Types.Response<T>;
     type OfferData = Types.OfferData;
+    type OwnedNFT = Types.OwnedNFT;
     stable var KITTIES_CANISTER_ID : Text = "rw7qm-eiaaa-aaaak-aaiqq-cai";
     stable var MARKEPTLACE_ACCOUNT_IDENTIFIER : Text = "5a1ed575be49c5e9971dceb72e19821da9e26206572a333177f6dc46933b00cc";
 
@@ -177,17 +178,38 @@ actor class () = this {
         return {
             status = 200;
             status_text = "Ok";
-            data = ?Buffer.toArray(tempBuff);
+            data = ?Buffer.toArray<Types.ListedNFTData>(tempBuff);
             error_text = null;
         };
 
     };
 
+    // public func get_all_user_listed_nfts(user : Text) : async Response<OwnedNFT> {
+    //     let tempBuffer = Buffer.Buffer<OwnedNFT>(0);
+
+    //     for (nft in NftListingHashMap.vals()) {
+    //         if (nft.seller_identifier == user) {
+    //             tempBuffer.add({
+    //                 collection = nft.nft_category;
+    //                 nft_id = nft.nft_id;
+    //                 canister_id = nft.nft_canister;
+    //                 category = #Listed;
+
+    //             });
+    //         };
+    //     };
+
+    //     //fetch all the user tokens from the nft canister
+
+    //     let ownedNFTS = await
+
+    // };
+
     //get all the listed nfts
-
+    //refactor to only return where the confirmation is true
     public query func get_all_listed_nfts() : async Response<[(Text, Types.ListedNFTData)]> {
-
         let data = Iter.toArray<(Text, Types.ListedNFTData)>(NftListingHashMap.entries());
+
         return {
             status = 200;
             status_text = "Ok";
@@ -397,12 +419,12 @@ actor class () = this {
 
                         switch (nftTransfer) {
                             case (#ok(num)) {
-                                
+
                                 //transfer the icp to the seller
-                                let res = await transferICP(data.seller_principal, data.nft_price-10000);
+                                let res = await transferICP(data.seller_principal, data.nft_price -10000);
                                 if (res == true) {
 
-                                   ignore NftListingHashMap.remove(nft_id);
+                                    ignore NftListingHashMap.remove(nft_id);
 
                                     return {
                                         status = 200;
@@ -426,7 +448,7 @@ actor class () = this {
                             };
                             case (_) {
                                 //refund the icp to the user
-                                let res = await transferICP(caller, data.nft_price-10000);
+                                let res = await transferICP(caller, data.nft_price -10000);
                                 if (res == true) {
 
                                     return {

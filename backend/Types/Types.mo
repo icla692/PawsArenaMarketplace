@@ -47,14 +47,20 @@ public type ClaimData={
     settled:Bool;
 };
 
+public type OwnedNFT={
+    collection:NFT_CATEGORY;
+    nft_id:Nat32;
+    canister_id:Text;
+    category:{#Listed;#Owned}
+}
 
-type SaleTransaction = {
-    tokens : [TokenIndex];
-    seller : Principal;
-    price : Nat64;
-    buyer : AccountIdentifier;
-    time : Time;
-  };
+// type SaleTransaction = {
+//     tokens : [TokenIndex];
+//     seller : Principal;
+//     price : Nat64;
+//     buyer : AccountIdentifier;
+//     time : Time;
+//   };
 
 
 };
