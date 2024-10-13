@@ -1,0 +1,5 @@
+type _anon_class_10_1 = service {
+  getPrincipal : () -> (text) query;
+  getTransactions : () -> (nat);
+};
+service : _anon_class_10_1
