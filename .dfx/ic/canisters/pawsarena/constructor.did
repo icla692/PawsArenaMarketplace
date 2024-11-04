@@ -26,34 +26,57 @@ type Response = record {
 };
 type Response_1 = record {
   status : nat16;
-  data : opt ListedNFTData;
+  data : opt vec vec SaleTransaction;
   status_text : text;
   error_text : opt text;
 };
 type Response_2 = record {
   status : nat16;
-  data : opt vec ListedNFTData;
+  data : opt vec SaleTransaction;
   status_text : text;
   error_text : opt text;
 };
 type Response_3 = record {
   status : nat16;
+  data : opt ListedNFTData;
+  status_text : text;
+  error_text : opt text;
+};
+type Response_4 = record {
+  status : nat16;
+  data : opt vec ListedNFTData;
+  status_text : text;
+  error_text : opt text;
+};
+type Response_5 = record {
+  status : nat16;
   data : opt vec record { text; ListedNFTData };
   status_text : text;
   error_text : opt text;
 };
-type _anon_class_15_1 = service {
+type SaleTransaction = record {
+  token : text;
+  time : int;
+  seller : principal;
+  buyer : principal;
+  price : nat64;
+};
+type _anon_class_17_1 = service {
   accept_offer : (text, nat32) -> (Response);
   buy_nft : (text) -> (Response);
+  cancel_offer : (nat32, text) -> (Response);
   claim_nft : (text) -> (text);
   complete_listing : (principal, nat, NFT_CATEGORY) -> (Response);
-  get_all_listed_nfts : () -> (Response_3) query;
-  get_all_user_listed_nfts : (principal) -> (Response_2) query;
-  get_listed_nft_details : (text) -> (Response_1) query;
+  get_all_listed_nfts : () -> (Response_5) query;
+  get_all_test : () -> (Response_5) query;
+  get_all_user_listed_nfts : (principal) -> (Response_4) query;
+  get_listed_nft_details : (text) -> (Response_3) query;
+  get_nft_sale_history : (text) -> (Response_2) query;
   init_list_nft : (principal, nat, NFT_CATEGORY, nat) -> (Response);
   place_offer_on_nft : (text, nat, int) -> (Response);
+  salesTransactions : () -> (Response_1) query;
   transferNftMarketplace : (principal, text, NFT_CATEGORY) -> (bool);
   un_list_nft : (text) -> (Response);
   update_nft_price : (text, nat) -> (Response);
 };
-service : () -> _anon_class_15_1
+service : () -> _anon_class_17_1

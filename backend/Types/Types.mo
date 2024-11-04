@@ -33,34 +33,33 @@ module {
     };
     //bidder to place a
     public type OfferData = {
-        offer_id:Nat32;
+        offer_id : Nat32;
         user : Principal;
         amount : Nat;
         expiry_date : Int;
     };
 
-//claim funds incase of funds not transfered
-public type ClaimData={
-    id:Nat;
-    claimer:Principal;
-    amount:Nat;
-    settled:Bool;
-};
+    //claim funds incase of funds not transfered
+    public type ClaimData = {
+        id : Nat;
+        claimer : Principal;
+        amount : Nat;
+        settled : Bool;
+    };
 
-public type OwnedNFT={
-    collection:NFT_CATEGORY;
-    nft_id:Nat32;
-    canister_id:Text;
-    category:{#Listed;#Owned}
-}
+    public type OwnedNFT = {
+        collection : NFT_CATEGORY;
+        nft_id : Nat32;
+        canister_id : Text;
+        category : { #Listed; #Owned };
+    };
 
-// type SaleTransaction = {
-//     tokens : [TokenIndex];
-//     seller : Principal;
-//     price : Nat64;
-//     buyer : AccountIdentifier;
-//     time : Time;
-//   };
-
+    public type SaleTransaction = {
+        token : Text;
+        seller : Principal;
+        price : Nat64;
+        buyer : Principal;
+        time : Int;
+    };
 
 };

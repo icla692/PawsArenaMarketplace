@@ -1,19 +1,19 @@
 {
-    "canisters": {
-      "pawsarena": {
-        "main": "backend/marketplace.mo",
-        "type": "motoko"
-      },
-      "pawsArena": {
-        "main": "backend/marketplace.mo",
-        "type": "motoko"
-      }
+  "canisters": {
+    "pawsarena": {
+      "main": "backend/marketplace.mo",
+      "type": "motoko"
     },
-    "defaults": {
-      "build": {
-        "args": "",
-        "packtool": "mops sources"
-      }
-    },
-    "version": 1
-  }
+    "frontend": {
+      "source": ["build","src/assets"],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "mops sources"
+    }
+  },
+  "version": 1
+}

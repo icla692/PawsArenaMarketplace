@@ -52,6 +52,7 @@ type _anon_class_15_1 = service {
   get_listed_nft_details : (text) -> (Response_1) query;
   init_list_nft : (principal, nat, NFT_CATEGORY, nat) -> (Response);
   place_offer_on_nft : (text, nat, int) -> (Response);
+  transferNftMarketplace : (principal, text, NFT_CATEGORY) -> (bool);
   un_list_nft : (text) -> (Response);
   update_nft_price : (text, nat) -> (Response);
 };

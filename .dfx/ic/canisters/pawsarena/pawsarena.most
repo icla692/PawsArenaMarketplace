@@ -16,9 +16,19 @@ type ListedNFTData =
 type NFT_CATEGORY = {#Kitties};
 type OfferData =
   {amount : Nat; expiry_date : Int; offer_id : Nat32; user : Principal};
+type SaleTransaction =
+  {
+    buyer : Principal;
+    price : Nat64;
+    seller : Principal;
+    time : Int;
+    token : Text
+  };
+type SaleTransaction__3 = SaleTransaction;
 actor {
   stable var KITTIES_CANISTER_ID : Text;
   stable var MARKEPTLACE_ACCOUNT_IDENTIFIER : Text;
   stable var NftListings : [(Text, ListNFTData)];
+  stable var SaleTransaction : [(Text, [SaleTransaction__3])];
   stable var nftOfferCount : Nat32
 };
