@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfrontend=self.webpackChunkfrontend||[]).push([[522],{522:(e,n,d)=>{d.r(n),d.d(n,{default:()=>t});d(5043);var s=d(579);const t=()=>(0,s.jsx)("div",{children:"owned nft details"})}}]);
+//# sourceMappingURL=522.32a7a008.chunk.js.map

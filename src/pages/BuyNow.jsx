@@ -4,6 +4,7 @@ import { MARKETPLACE_CANISTER } from "../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../Utils/useFecth";
+import { useNavigate } from "react-router-dom";
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
  
@@ -49,6 +50,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     queryKey: ["IcpActor"],
   });
 
+  const navigate = useNavigate()
   const { mutateAsync: HandleBuy } = useMutation({
     mutationFn: () => handleBuy(),
     onSuccess: async () => {
@@ -94,8 +96,9 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
       }
       console.log("buy results :", res);
     } catch (error) {
-      console.log("erro in buying nft :", error);
+      console.log("error in buying nft :", error);
     }
+    navigate("/profile")
   };
 
   return (

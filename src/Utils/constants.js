@@ -10,3 +10,13 @@ export const NFTCollections = [
     imageUrl: "https://hdem4-ryaaa-aaaam-qa4xa-cai.raw.ic0.app/?index=70",
   },
 ];
+
+
+
+
+export function getUnixTimestampInNanoseconds(days) {
+  const now = new Date();
+  const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+  const unixTimestampInNanoseconds = futureDate.getTime() * 1e6; // 1 second = 1e9 nanoseconds
+  return unixTimestampInNanoseconds;
+}

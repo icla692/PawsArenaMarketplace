@@ -25,14 +25,18 @@ const shortenAddress = (address) => {
             </tr>
         </thead>
         <tbody className=" divide-y divide-gray-200">
-            {history?.length > 0 && history?.map((item, index) => (
+            {history?.length > 0 ? history?.map((item, index) => (
                 <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{shortenAddress(item?.buyer?.toString())}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{shortenAddress(item?.seller?.toString())}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{Number(item?.price)/1e8}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{convertTime(item?.time)}</td>
                 </tr>
-            ))}
+            ))
+            :
+            <div className='text-xs flex justify-center items-center '>No activity available</div>
+          
+          }
         </tbody> 
     </table>
 </div>

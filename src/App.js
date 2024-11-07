@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import useFecth from "./Utils/useFecth";
-import { IdentityKitProvider } from "@nfid/identitykit/react";
+import { IdentityKitProvider, useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { NFIDW } from "@nfid/identitykit";
 import { NFTCollections } from "./Utils/constants";
 import Footer from "./pages/Footer";
@@ -19,19 +19,30 @@ const OwnerNFTDetails = lazy(() => import("./pages/OwnerNFTDetails"));
 const CollectionDetails = lazy(() => import("./pages/collection/CollectionDetails"));
 const TestPage = lazy(()=>import("./pages/ListedNFT/TestPage"));
 function App() {
-
+const agent = useAgent()
   const { invalidateListings } = useFecth();
+  const {
+    isInitializing,
+    user,
+    isUserConnecting,
+    icpBalance,
+    signer,
+    identity,
+    delegationType,
+    accounts,
+    connect,
+    disconnect,
+    fetchIcpBalance,
+  } = useIdentityKit();
   
   //load all the necessary data at the beginning so as to make the website faster
 
+console.log("xxxxxx :",user,agent);
 
   return (
     <div className="flex flex-col min-h-screen">
     <IdentityKitProvider
       featuredSigner={[NFIDW]}
-      signerClientOptions={{
-        derivationOrigin: "https://awcae-maaaa-aaaam-abmyq-cai.icp0.io/",
-      }}
       onConnectSuccess={(e) => {
       }}
       >

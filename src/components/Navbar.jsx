@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
@@ -6,6 +6,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Login from "../pages/Login";
 import pawsarena from "../assets/pawsarena.png";
+import { useIdentityKit } from "@nfid/identitykit/react";
 
 const style = {
   wrapper: `bg-[#04111d] fixed z-50 w-full px-[1.2rem] md:px-[4.2rem] py-[0.8rem] flex items-center justify-between top-0 `,
@@ -30,6 +31,25 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown menu
 
+  const {
+    agent,
+    isInitializing,
+    user,
+    isUserConnecting,
+    icpBalance,
+    signer,
+    identity,
+    delegationType,
+    accounts,
+    connect,
+    disconnect,
+    fetchIcpBalance,
+  } = useIdentityKit();
+
+
+
+
+
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
   });
@@ -39,16 +59,27 @@ const Navbar = () => {
   };
 
   const toggleDropdown = () => {
+    console.log("cccccnn");
+    
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleLogout = async () => {
     // Implement logout functionality here
-    await queryClient.setQueryData(["userPrincipal"], null);
+    disconnect()
+     await queryClient.setQueryData(["userPrincipal"], null);
 
     // await queryClient.invalidateQueries(["userPrincipal"])
     setIsDropdownOpen(false); // Close dropdown after logout
+    navigate("/")
   };
+
+
+  
+  useEffect(()=>{
+    
+     console.log("user :",agent);
+  },[agent])
 
   return (
     <div className={style.wrapper}>
@@ -61,7 +92,7 @@ const Navbar = () => {
           Paws Arena
         </div>
       </div>
-      <div className={style.searchBar}>
+      {/* <div className={style.searchBar}>
         <div className={style.searchIcon}>
           <AiOutlineSearch />
         </div>
@@ -69,7 +100,7 @@ const Navbar = () => {
           className={style.searchInput}
           placeholder="Search items, collections, and accounts"
         />
-      </div>
+      </div> */}
       <div className="md:hidden">
         <GiHamburgerMenu
           className="cursor-pointer"
@@ -78,22 +109,22 @@ const Navbar = () => {
         />
       </div>
       <div className={style.headerItems}>
-        <div
+        {/* <div
           onClick={() => {navigate("/dashboard");toggleMenu()}}
           className={style.headerItem}
         >
           
           Marketplace
-        </div>
-        <div className={style.headerItem}> Stats </div>
-        <div className={style.headerItem}> Resources </div>
-        <div className={style.headerItem}> Create </div>
+        </div> */}
+        {/* <div className={style.headerItem}> Stats </div> */}
+        {/* <div className={style.headerItem}> Resources </div> */}
+        {/* <div className={style.headerItem}> Support </div> */}
         <div className={style.headerIcon} onClick={toggleDropdown}>
-          {userPrincipal ? <CgProfile /> : <Login />}
+          {user?.principal ? <CgProfile /> : <Login />}
         </div>
 
         {/* Dropdown Menu */}
-        {isDropdownOpen && userPrincipal && (
+        {isDropdownOpen && user?.principal && (
           <div className={style.dropdownMenu}>
             <div
               className={style.dropdownItem}
@@ -120,28 +151,28 @@ const Navbar = () => {
           >
             Marketplace
           </div>
-          <div
+          {/* <div
             className={style.mobileItem}
             onClick={() =>  {navigate("/dashboard");toggleMenu()}}
           >
             Stats
-          </div>
-          <div
+          </div> */}
+          {/* <div
             className={style.mobileItem}
             onClick={() =>  {navigate("/dashboard");toggleMenu()}}
           >
             Resources
-          </div>
-          <div
+          </div> */}
+          {/* <div
             className={style.mobileItem}
             onClick={() =>  {navigate("/dashboard");toggleMenu()}}
           >
             Create
-          </div>
+          </div> */}
           <div className={style.mobileItem} onClick={toggleDropdown}>
-            {userPrincipal ? <CgProfile /> : <Login />}
+            {user ? <CgProfile /> : <Login />}
           </div>
-          {isDropdownOpen && userPrincipal && (
+          {isDropdownOpen && user && (
             <div className={style.mobileDropdownMenu}>
               <div
                 className={style.dropdownItem}

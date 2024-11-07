@@ -8,7 +8,7 @@ const MoreNfts = ({ collectionID, nftID, nftPrice,nftDetails }) => {
     queryKey: ["myTokens"],
   });
 
-  console.log("cccc :", nftPrice);
+  // console.log("cccc :", nftPrice);
 
   //get the nfts from this nft that have the same price range as the nft being listed
   useEffect(() => {

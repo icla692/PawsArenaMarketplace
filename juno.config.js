@@ -3,7 +3,7 @@ import {defineConfig} from '@junobuild/config';
 /** @type {import('@junobuild/config').JunoConfig} */
 export default defineConfig({
   satellite: {
-    id: 's2bfj-5iaaa-aaaal-amnnq-cai',
+    id: 'vvtio-yyaaa-aaaal-amsza-cai',
     source: 'build'
   }
 });
@@ -11,3 +11,4 @@ export default defineConfig({
 //  lxh7w-xiaaa-aaaal-amprq-cai
 // j4kzr-5qaaa-aaaal-amiaq-cai
 // s2bfj-5iaaa-aaaal-amnnq-cai
+//vvtio-yyaaa-aaaal-amsza-cai

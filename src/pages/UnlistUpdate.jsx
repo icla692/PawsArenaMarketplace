@@ -4,21 +4,19 @@ import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../Utils/useFecth";
 
-const UnlistUpdate = ({nft}) => {
-  console.log("nft id :", nft);
+const UnlistUpdate = ({ nft }) => {
+  // console.log("nft id :", nft);
 
   const [newPrice, setNewPrice] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [buttonLoading, setButtonLoading] = useState(false);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
 
-  const {invalidateListings,invalidateUserNfts} = useFecth()
-
-
+  const { invalidateListings, invalidateUserNfts } = useFecth();
 
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
@@ -27,9 +25,6 @@ const UnlistUpdate = ({nft}) => {
     setTimeout(() => setShowModal(false), 3000);
   };
 
-
-
-  
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
   });
@@ -58,29 +53,22 @@ const UnlistUpdate = ({nft}) => {
     queryKey: ["marketplaceActor"],
   });
 
-
   const { mutateAsync: HandleList } = useMutation({
     mutationFn: () => handleUnlist(),
     onSuccess: async () => {
-       invalidateListings()
-       invalidateUserNfts()
-       setButtonLoading(false);
+      invalidateListings();
+      invalidateUserNfts();
+      setButtonLoading(false);
     },
   });
-
-
-
-
-
-
 
   const handleUnlist = async () => {
     if (!nft) return;
     setButtonLoading(true);
 
     try {
-      let res = await marketplaceActor.un_list_nft(nft);
-     
+      let res = await marketplaceActor.un_list_nft(nft.token_identifier);
+
       if (res.status == 200 && res.status_text == "Ok") {
         displayNotificationModal("NFT unlisted successfully", "success");
       } else {
@@ -92,40 +80,40 @@ const UnlistUpdate = ({nft}) => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  //   console.log("new price : ", newPrice);
+    console.log("new price : ", newPrice);
 
-  //  if(!window.confirm("Update the price of the nft")) return
-  //  setIsLoading(true)
-  //   let res = await marketplaceActor.update_nft_price(
-  //     nftid.nftid,
-  //     parseInt(newPrice * 1e8)
-  //   );
-  //   setIsLoading(false)
-  // };
+   if(!window.confirm("Update the price of the nft")) return
+    let res = await marketplaceActor.update_nft_price(
+      nft.token_identifier,
+      parseInt(newPrice * 1e8)
+    );
+
+    console.log("update price :",res);
+    
+  };
 
   return (
-    <div>
-      <div className="flex flex-row ">
+    <div className="flex flex-col gap-1 w-full">
+      <div className="flex flex-row gap-4 w-full">
         <button
-          className="flex w-full bg-[#2E8DEE] mt-4 font-bold text-white justify-center items-center p-2"
-          onClick={() => setIsModalOpen(true)}
+        className="flex bg-[#2E8DEE] w-1/2 rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+        onClick={() => setIsModalOpen(true)}
         >
           Unlist
         </button>
-        {/* <button
-            className="flex bg-gray-300 text-gray-700 border border-gray-300 p-1 rounded-md "
-            onClick={() => setIsModalOpen(true)}
-          >
-            Update
-          </button> */}
+        <button
+        className="flex bg-[#5e6163] w-1/2 rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+        onClick={() => setIsModalOpen(true)}
+        >
+          Update
+        </button>
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-         
-         {showModal && (
+          {showModal && (
             <div
               className={`absolute top-10 text-xs z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
                 modalType === "success"
@@ -138,7 +126,7 @@ const UnlistUpdate = ({nft}) => {
               </div>
             </div>
           )}
-         
+
           <div className="bg-[#252525] rounded-lg shadow-lg p-6 w-96">
             <div className="flex justify-between ">
               <h2 className=" mb-4">Unlist NFT</h2>

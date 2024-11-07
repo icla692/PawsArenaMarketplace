@@ -59,21 +59,23 @@ const Searchbar = ({
           } */}
         </div>
       </div>
-      <div className="hidden md:block justify-between items-center cursor-pointer">
-        <div>
+      <div className="hidden md:flex-row md:block justify-between items-center cursor-pointer">
+        <div className="flex flex-row justify-between items-center ">
+         <div className="flex mt-4">
+
           <Button onClickHandler={handlelistedChange} value="all" title="All" />
           <Button
             onClickHandler={handlelistedChange}
             value="listed"
             title="Listed"
-          />
+            />
           <Button
             onClickHandler={handlelistedChange}
             value="hasoffers"
             title="Has Offers"
-          />
-        </div>
-        <div className="flex gap-4 items-center justify-between mt-4">
+            />
+            </div>
+          <div className="flex gap-4 items-center justify-center mt-4">
           <button
             onClick={prevPage}
             disabled={currentPage === 0}
@@ -93,6 +95,8 @@ const Searchbar = ({
             Next
           </button>
         </div>
+        </div>
+        
       </div>
 
       {isModalOpen && (

@@ -251,12 +251,12 @@ actor class () = this {
     //refactor to only return where the confirmation is true
     public query func get_all_listed_nfts() : async Response<[(Text, Types.ListedNFTData)]> {
         let data = Iter.toArray<(Text, Types.ListedNFTData)>(NftListingHashMap.entries());
-        
-        let tempBuff = Buffer.Buffer<(Text,Types.ListedNFTData)>(0);
-        for ((id,nft) in NftListingHashMap.entries()){
 
-            if(nft.isConfirmed == true){
-                tempBuff.add((id,nft));
+        let tempBuff = Buffer.Buffer<(Text, Types.ListedNFTData)>(0);
+        for ((id, nft) in NftListingHashMap.entries()) {
+
+            if (nft.isConfirmed == true) {
+                tempBuff.add((id, nft));
             };
         };
 
@@ -269,9 +269,9 @@ actor class () = this {
 
     };
 
-     public query func get_all_test() : async Response<[(Text, Types.ListedNFTData)]> {
+    public query func get_all_test() : async Response<[(Text, Types.ListedNFTData)]> {
         let data = Iter.toArray<(Text, Types.ListedNFTData)>(NftListingHashMap.entries());
-        
+
         // let tempBuff = Buffer.Buffer<(Text,Types.ListedNFTData)>(0);
         // for ((id,nft) in NftListingHashMap.entries()){
 
@@ -288,7 +288,6 @@ actor class () = this {
         };
 
     };
-
 
     //update the price of the nft on the marketplace
     public shared ({ caller }) func update_nft_price(nftidentifier : Text, newPrice : Nat) : async Response<Text> {
@@ -510,7 +509,9 @@ actor class () = this {
                                             tempBuff.add(_transaction);
                                             TransactionsHashMap.put(data.token_identifier, Buffer.toArray(tempBuff));
                                         };
-                                        case (null) {TransactionsHashMap.put(data.token_identifier,[_transaction],);};
+                                        case (null) {
+                                            TransactionsHashMap.put(data.token_identifier, [_transaction]);
+                                        };
                                     };
                                     //remove th nft from the marketplace
                                     ignore NftListingHashMap.remove(nft_id);
@@ -522,8 +523,7 @@ actor class () = this {
                                     };
 
                                 } else {
-                                    return
-                                    {
+                                    return {
                                         status = 200;
                                         status_text = "error";
                                         data = null;
@@ -651,21 +651,21 @@ actor class () = this {
             };
             case (?data) {
                 //check if the caller is the owner of the nft
-                if(data.seller_principal ==caller){
+                if (data.seller_principal == caller) {
                     return {
-                    status = 200;
-                    status_text = "error";
-                    data = null;
-                    error_text = ?"you cant make an offer on your own nft";
-                };
+                        status = 200;
+                        status_text = "error";
+                        data = null;
+                        error_text = ?"you cant make an offer on your own nft";
+                    };
                 };
 
                 let tempBuff = Buffer.fromArray<OfferData>(data.offers);
                 tempBuff.add({
                     offer_id = nftOfferCount;
                     user = caller;
-                    amount=amount;
-                    expiry_date= expiry_date;
+                    amount = amount;
+                    expiry_date = expiry_date;
                 });
 
                 nftOfferCount := nftOfferCount +1;
@@ -681,15 +681,14 @@ actor class () = this {
         };
     };
 
+    public shared ({ caller }) func cancel_offer(offerId : Nat32, nftId : Text) : async Response<Text> {
 
-    public shared({caller}) func cancel_offer(offerId:Nat32,nftId:Text):async Response<Text>{
-
-        switch(NftListingHashMap.get(nftId)) {
-            case(?data) { 
+        switch (NftListingHashMap.get(nftId)) {
+            case (?data) {
 
                 let tempBuff = Buffer.fromArray<OfferData>(data.offers);
                 tempBuff.filterEntries(func(_, x) = x.offer_id != offerId);
-                NftListingHashMap.put(nftId,{data with offers = Buffer.toArray(tempBuff)});
+                NftListingHashMap.put(nftId, { data with offers = Buffer.toArray(tempBuff) });
                 return {
                     status = 200;
                     status_text = "Ok";
@@ -697,29 +696,19 @@ actor class () = this {
                     error_text = null;
                 };
 
+            };
+            case (null) {
 
-
-             };
-            case(null) {
-
-                 return {
+                return {
                     status = 200;
                     status_text = "error";
                     data = null;
                     error_text = ?"nft does not exist";
                 };
-             };
+            };
         };
 
-
-
-
-
-
     };
-
-
-
 
     //get listed nft details
 
@@ -784,9 +773,10 @@ actor class () = this {
                         data = null;
                         error_text = ?"offer already expired";
                     };
-
                 };
 
+                //1730947002958069433
+                //1731377678446000128
                 //check the allowance of the markeplace
                 let allowanceResults = await icp_token_canister.icrc2_allowance({
                     account = {
@@ -798,6 +788,21 @@ actor class () = this {
                         subaccount = null;
                     };
                 });
+
+                //get the balance of the user that made the offer
+                let userBalance = await icp_token_canister.icrc1_balance_of({
+                    owner = offer.user;
+                    subaccount = null;
+                });
+
+                if (userBalance < offer.amount + 10000) {
+                    return {
+                        status = 200;
+                        status_text = "error";
+                        data = null;
+                        error_text = ?" user does not have enough funds";
+                    };
+                };
 
                 if (allowanceResults.allowance < offer.amount + 10000) {
                     return {
@@ -971,7 +976,7 @@ actor class () = this {
 
     system func postupgrade() {
         NftListings := [];
-        SaleTransaction :=[];
+        SaleTransaction := [];
     };
 
 };

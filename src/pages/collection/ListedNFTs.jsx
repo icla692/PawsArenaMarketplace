@@ -57,13 +57,14 @@ const ListedNFTs = ({
             </div>
           </div>
          )} 
+      <div className="flex flex-col w-full">
         <div className="flex flex-row w-full">
           {/* Display the NFTs */}
-          <div className="flex-grow w-full flex mt-6 justify-center items-center flex-wrap">
+          <div className="flex-grow w-full flex  justify-center items-center flex-wrap">
             {isLoading ? <ClipLoader size={25} color="white" /> : results}
           </div>
         </div>
-      
+      </div>
     </div>
   );
 };

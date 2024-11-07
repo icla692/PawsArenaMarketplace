@@ -19,7 +19,7 @@ const CollectionDetails = () => {
     const [collectionData, setCollectionData] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortPrice, setSortPrice] = useState("lowtohigh");
-    const [listedFilter, setListedFilter] = useState("listed");
+    const [listedFilter, setListedFilter] = useState("all");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -39,10 +39,8 @@ const CollectionDetails = () => {
    
     const { data: myTokens, isLoading: dataLoading } = useQuery({ queryKey: ["myTokens"] });
 
+    // const { data: myTokens, isLoading: dataLoading } = useQuery({ queryKey: ["myTokens"] });
 
-    const { data: customNftData } = useQuery({
-        queryKey: [collectionID],
-      });
 
       const { data: collectionDetails,isLoading:collectionLoading } = useQuery({
         queryKey: ["collectionDetails"],
@@ -81,20 +79,12 @@ const CollectionDetails = () => {
                let colDetails = collectionDetails?.find((det)=>det.canisterId == collectionID)
                
                
-               console.log("dede :",tokenListings[1].listings);
                
                 // Combine results
                 
 
                     const combinedListings = [...tokenListings[1]?.listings, ...nftIds];
                     setListedNfts(combinedListings);
-                
-                
-                
-                console.log("filte eeee :",tokenListings[1]);
-                console.log("col details :",colDetails);
-                
-
                 // Fetch additional stats and tokens
                 // const nftStats = await nftActor.stats();
                 // const allTokensResponse = await nftActor.getTokens();
@@ -128,7 +118,6 @@ const CollectionDetails = () => {
                 setIsLoading(false);
             }
         };
-
         fetchNFTDetails();
     }, [collectionID]); // Only re-run when collectionID changes
 
@@ -165,14 +154,41 @@ const CollectionDetails = () => {
     
     // Filtering and sorting logic using memoization for performance
     const finalFilteredData = useMemo(() => {
-        let filteredProducts = listedNfts;
-
+        let filteredProducts = [...listedNfts]; // Start with a copy of listedNfts
+    
+        // Filter based on searchQuery
         if (searchQuery) {
             filteredProducts = filteredProducts.filter(nft =>
                 nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
-
+    
+        // Apply the listedFilter
+        if (listedFilter === "listed") {
+            filteredProducts = filteredProducts.filter(nft => 
+                nft[1]?.hasOwnProperty('price')
+            );
+        } else if (listedFilter === "all") {
+            // If listedFilter is "all", we could reset to allTokens if needed
+            filteredProducts = [...allTokens];
+            console.log("all tokens :",allTokens);
+            
+        }
+    
+        // Apply price filtering if minPrice or maxPrice is set
+        if (minPrice) {
+            filteredProducts = filteredProducts.filter(nft =>
+                Number(nft[1]?.price) / 1e8 >= parseFloat(minPrice)
+            );
+        }
+    
+        if (maxPrice) {
+            filteredProducts = filteredProducts.filter(nft =>
+                Number(nft[1]?.price) / 1e8 <= parseFloat(maxPrice)
+            );
+        }
+    
+        // Apply sorting based on sortPrice
         if (sortPrice) {
             filteredProducts.sort((a, b) =>
                 sortPrice === "lowtohigh"
@@ -180,34 +196,15 @@ const CollectionDetails = () => {
                     : Number(b[1].price) - Number(a[1].price)
             );
         }
-
-        if (listedFilter == "listed") {
-            filteredProducts = filteredProducts.filter(nft => nft[1]?.hasOwnProperty('price'));
-        }
+    
+        // Pagination: slice the array for current page
+        const startIndex = currentPage * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
         
-        // else if(listedFilter =="all"){
-        //     console.log("zzz");
-            
-        //     filteredProducts = listedNfts
-        // }
-
-        if (minPrice) {
-            filteredProducts = filteredProducts.filter(nft =>
-                Number(nft[1]?.price) / 1e8 >= parseFloat(minPrice)
-            );
-        }
-
-        if (maxPrice) {
-            filteredProducts = filteredProducts.filter(nft =>
-                Number(nft[1]?.price) / 1e8 <= parseFloat(maxPrice)
-            );
-        }
-
-        return filteredProducts.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((nft, index) => (
-          <Card key={index} nft={nft} collectionID={collectionID} />
-      ));
-  }, [listedNfts, searchQuery, sortPrice, listedFilter, minPrice, maxPrice, currentPage]);
-
+        return filteredProducts.slice(startIndex, endIndex).map((nft, index) => (
+            <Card key={index} nft={nft} collectionID={collectionID} />
+        ));
+    }, [listedNfts, allTokens, searchQuery, sortPrice, listedFilter, minPrice, maxPrice, currentPage]);
     // Calculate total pages based on all tokens
     const totalPages = Math.ceil(allTokens.length / itemsPerPage);
 

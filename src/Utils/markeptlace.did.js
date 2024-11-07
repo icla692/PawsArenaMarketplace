@@ -73,6 +73,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'get_all_listed_nfts' : IDL.Func([], [Response_5], ['query']),
+    'get_all_test' : IDL.Func([], [Response_5], ['query']),
     'get_all_user_listed_nfts' : IDL.Func(
         [IDL.Principal],
         [Response_4],
@@ -91,6 +92,11 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'salesTransactions' : IDL.Func([], [Response_1], ['query']),
+    'transferNftMarketplace' : IDL.Func(
+        [IDL.Principal, IDL.Text, NFT_CATEGORY],
+        [IDL.Bool],
+        [],
+      ),
     'un_list_nft' : IDL.Func([IDL.Text], [Response], []),
     'update_nft_price' : IDL.Func([IDL.Text, IDL.Nat], [Response], []),
   });
