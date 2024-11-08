@@ -4,10 +4,10 @@
 
 body {
   margin:0;
-  font-family:"Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #121212;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   /* background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     url("./assets/pasback.png"); */
   /* background-repeat: no-repeat;

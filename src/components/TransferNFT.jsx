@@ -14,6 +14,19 @@ const TransferNFT = ({ nft }) => {
   const [buttonLoading, setButtonLoading] = useState(false);
 
 
+  const { data: userPrincipal } = useQuery({
+    queryKey: ["userPrincipal"],
+  });
+
+  const { data: nftActor } = useQuery({
+    queryKey: ["nftActor"],
+  });
+
+  const { data: marketplaceActor } = useQuery({
+    queryKey: ["marketplaceActor"],
+  });
+
+  
   const {invalidateListings} = useFecth()
 
   //modals for the notification popup
@@ -77,18 +90,7 @@ if (transferResults.ok) {
 
   }
 
-  const { data: userPrincipal } = useQuery({
-    queryKey: ["userPrincipal"],
-  });
-
-  const { data: nftActor } = useQuery({
-    queryKey: ["nftActor"],
-  });
-
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
+  
   return (
     <div className="relative flex-row gap-1 flex w-full bg-[#2E8DEE] font-bold text-white justify-center items-center p-2 ">
       <button onClick={() => setIsModalOpen(true)}>Transfer</button>

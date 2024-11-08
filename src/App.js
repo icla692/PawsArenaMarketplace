@@ -8,6 +8,7 @@ import { NFIDW } from "@nfid/identitykit";
 import { NFTCollections } from "./Utils/constants";
 import Footer from "./pages/Footer";
 import Index from "./pages/Index";
+import Hero from "./pages/Hero";
 
 // Lazy load pages
 const Login = lazy(() => import("./pages/Login"));
@@ -23,21 +24,10 @@ const agent = useAgent()
   const { invalidateListings } = useFecth();
   const {
     isInitializing,
-    user,
-    isUserConnecting,
-    icpBalance,
-    signer,
-    identity,
-    delegationType,
-    accounts,
-    connect,
-    disconnect,
-    fetchIcpBalance,
   } = useIdentityKit();
   
   //load all the necessary data at the beginning so as to make the website faster
 
-console.log("xxxxxx :",user,agent);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -49,7 +39,7 @@ console.log("xxxxxx :",user,agent);
       <Navbar />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/collection/:collectionID" element={<CollectionDetails />} />
           <Route path="/profile" element={<Profile />} />

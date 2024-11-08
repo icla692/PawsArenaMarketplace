@@ -14,13 +14,17 @@ const MoreNfts = ({ collectionID, nftID, nftPrice,nftDetails }) => {
   useEffect(() => {
     const getMoreNfts = async () => {
       try {
+
+        console.log(" gg sd :",myTokens);
+        
         let rangePrice = myTokens
-          ?.filter(
-            (nft) =>
-              (Number(nft[1].price) / 1e8).toFixed(2) > nftPrice - 0.2 &&
-              (Number(nft[1].price) / 1e8).toFixed(2) < nftPrice + 0.2 && nft[0] != nftID
-          )
-          .slice(0, 4);
+          ?.slice(Math.ran, 4);
+          
+          // .filter(
+          //   (nft) =>
+          //     (Number(nft[1].price) / 1e8).toFixed(2) > nftPrice - 0.2 &&
+          //     (Number(nft[1].price) / 1e8).toFixed(2) < nftPrice + 0.2 && nft[0] != nftID
+          // )
 
 
         let cardNts = rangePrice?.map((nft, index) => (

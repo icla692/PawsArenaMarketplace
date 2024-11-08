@@ -18,8 +18,9 @@ import Offers from "./Offers";
 import MoreNfts from "./MoreNfts";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
-import UnlistUpdate from "../UnlistUpdate";
+import UnlistUpdate from "../Unlist";
 import { useIdentityKit } from "@nfid/identitykit/react";
+import UpdatePrice from "./UpdatePrice";
 const style = {
   wrapper: `flex gap-3 mt-[80px] flex-col md:flex-row justify-center bg-[#121212] h-screen p-4 text-white`,
   leftwrapper: `flex flex-col  items-center md:items-start  mb-4 md:mb-0`,
@@ -82,6 +83,8 @@ const ListedNFTDetails = () => {
       try {
         if (!colID || !nftID) return;
 
+        setButtonLoading(true)
+
         let tokenIdentifier = computeExtTokenIdentifier(nftID, colID);
         // let nftInfo = myTokens?.filter((nft) => nft[0] == nftID);
 
@@ -123,6 +126,8 @@ const ListedNFTDetails = () => {
       } catch (error) {
         console.log("error in fetching details :", error);
       }
+
+      setButtonLoading(false)
     };
 
     fetchDetails();
@@ -190,7 +195,7 @@ const ListedNFTDetails = () => {
   };
 
   return (
-    <div className="flex w-full h-full gap-4 flex-col text-white xs:pr-4 md:pr-0 md:px-20 mt-[80px]">
+    <div className="flex w-full h-full gap-4 flex-col text-white mr-6 pr-6 md:px-20 mt-[80px]">
       <div className="flex w-full h-full flex-col md:flex-row gap-2 mx-4">
         <div className="flex flex-col gap-4 w-full md:w-1/2 h-full md:items-start  mb-4 md:mb-0">
           <div className="rounded-lg p-1 w-full flex border border-gray-400 pt-3 flex-col">
@@ -220,21 +225,22 @@ const ListedNFTDetails = () => {
               <span>20 views</span>
             </div>
 
-            <div className="flex flex-col xs:px-3 md:px-0 gap-4 w-full">
-              <div className="flex  flex-col w-full gap-1 bg-[#1B1B1B] border border-gray-400 p-2 rounded-lg">
+            <div className="flex flex-col  xs:px-3 md:px-0 gap-4 w-full">
+              <div className="flex  flex-col w-full gap-1  bg-[#1B1B1B] border border-gray-400 p-2 rounded-lg">
                 <h3>Current Price</h3>
                 <span className="text-[25px]">
                   {nftDetails &&
-                    (Number(nftDetails?.nft_price) / 1e8).toFixed(2)}{" "}
+                    (Number(nftDetails?.nft_price) / 1e8).toFixed(2)}
                   ICP
                 </span>
-                {user &&
-                user?.principal?.toString() ==
-                  nftDetails?.seller_principal?.toString() ? (
-                  <UnlistUpdate nft={nftDetails} />
+                {
+                user && user.principal.toString() ==
+                  nftDetails?.seller_principal?.toString() ?(
+                  <div className="flex flex-row gap-4 justify-center items-center w-full">
+                    <UnlistUpdate nft={nftDetails} />
+                    <UpdatePrice nft={nftDetails} handleTrigger={handleTrigger} />
+                  </div>
                 ) : (
-
-                  
                   <div className="flex flex-row gap-4 w-full">
                     <BuyNow
                       nft_price={Number(nftDetails?.nft_price)}
@@ -246,7 +252,9 @@ const ListedNFTDetails = () => {
                       handleTrigger={handleTrigger}
                     />
                   </div>
-                )}
+                )
+                
+                }
               </div>
 
               <SaleHistory history={saleHistory} />

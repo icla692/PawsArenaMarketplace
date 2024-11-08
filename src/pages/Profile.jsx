@@ -6,18 +6,20 @@ import { AiOutlineCopy } from "react-icons/ai"; // Import copy icon
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
 import { computeExtTokenIdentifier } from "../Utils/tid";
-import UnlistUpdate from "./UnlistUpdate";
+import UnlistUpdate from "./Unlist";
 import ListNFT from "../components/ListNFT";
 import { useNavigate } from "react-router-dom";
 import TransferNFT from "../components/TransferNFT";
 import TransferICP from "../components/TransferICP";
+import { useIdentityKit } from "@nfid/identitykit/react";
+import UpdatePrice from "./ListedNFT/UpdatePrice";
 
 const style = {
-  wrapper: `flex bg-[#121212] min-h-screen flex-col w-full items-center p-4 text-white`,
+  wrapper: `flex mt-[80px] bg-[#121212] min-h-screen flex-col w-full items-center p-4 text-white`,
   profileSection: `flex flex-col gap-1 justify-evenly items-center bg-[#212121] rounded-lg p-4 w-full max-w-4xl mb-6`,
   profilePicture: `h-24 w-24 md:h-32 md:w-32 rounded-full border-2 border-[#8a939b] mb-4`,
-  addressContainer: `flex  mb-2`,
-  address: `  mb-2 text-center`,
+  addressContainer: `flex flex-row gap-2 items-center justify-center`,
+  address: `  mt-20 mb-2 text-center`,
   balance: `text-md text-[#8a939b] mb-4`,
   qrCodeContainer: `flex flex-col items-center`,
   qrCodeLabel: `text-md font-semibold mb-2`,
@@ -34,6 +36,8 @@ const style = {
 const Profile = () => {
   const [userNFTList, setuserNFTList] = useState(null);
   const [userAccount, setUserAccount] = useState(null);
+  const [trigger,setTrigger] = useState("")
+  const {user} = useIdentityKit()
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
   });
@@ -124,40 +128,44 @@ const Profile = () => {
     };
 
     fetchUserListedNFTS();
-  }, [userPrincipal, marketplaceActor, nftActor, userNFTS]);
+  }, [userPrincipal, marketplaceActor, nftActor, userNFTS,trigger]);
 
-  const userAddress = userPrincipal || "0x1234567890abcdef";
-  const userBalance = userIcpBalance || 100;
+
+  const handleTrigger = (e) => setTrigger(Math.random());
+
+
 
   const handleCopyAddress = (userAddress) => {
     navigator.clipboard.writeText(userAddress);
     alert("Address copied to clipboard!");
   };
 
-  const shortenAddress = (address) => {
-    return `${address.slice(0, 11)}...${address.slice(-7)}`;
+  const shortenAddress = (address,nom) => {
+    return `${address.slice(0, nom)}...${address.slice(-7)}`;
   };
 
+  // console.log("user here :",user?.principal?.toString());
+  
   return (
     <>
-      {userPrincipal ? (
+      {user?.principal ? (
         <div className={style.wrapper}>
           <div className={style.profileSection}>
-            <div className={style.addressContainer}>
-              <div className={style.address}>
-                {userAddress && shortenAddress(userAddress)}
+            <div className="flex flex-row items-center justify-between gap-4">
+              <div className="">
+                { shortenAddress(user?.principal?.toString(),20)}
               </div>
               <AiOutlineCopy
-                onClick={()=>handleCopyAddress(userAddress)}
-                className="cursor-pointer text-lg hover:text-blue-500"
+                onClick={()=>handleCopyAddress(user?.principal?.toText())}
+                
               />
             </div>
             <div className={style.addressContainer}>
-              <div className={style.address}>
-                {userAccount && shortenAddress(userAccount)}
+              <div className>
+                {user && shortenAddress(AccountIdentifier.fromPrincipal({principal:user.principal})?.toHex(),18)}
               </div>
               <AiOutlineCopy
-                onClick={()=>handleCopyAddress(userAccount)}
+                onClick={()=>handleCopyAddress(AccountIdentifier.fromPrincipal({principal:user.principal})?.toHex())}
                 className="cursor-pointer text-lg hover:text-blue-500"
               />
             </div>
@@ -171,8 +179,8 @@ const Profile = () => {
             <h2 className="text-xl font-semibold mb-4 text-center">My NFTs</h2>
 
             <div className={style.nftGrid}>
-              {userNFTList && userNFTList.length > 0 ? (
-                userNFTList.map((nft, index) => (
+              {userNFTList && userNFTList?.length > 0 ? (
+                userNFTList?.map((nft, index) => (
                   <div className={style.nftCard}>
                     <img
                       src={`https://${
@@ -210,13 +218,19 @@ const Profile = () => {
                         <TransferNFT nft={nft} />
                       </div>
                     ) : (
+                      <div className="flex flex-row p-1 gap-4 justify-center items-center">
+
                       <UnlistUpdate
                         nft={computeExtTokenIdentifier(
                           nft.nftid,
                           nft.canister_id
                         )}
-                      />
-                    )}
+                        />
+                    <UpdatePrice nft={nft} handleTrigger={handleTrigger} />
+                    </div>
+                    )
+                    
+                    }
                   </div>
                 ))
               ) : (

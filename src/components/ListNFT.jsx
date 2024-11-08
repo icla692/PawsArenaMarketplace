@@ -6,7 +6,9 @@ import { ClipLoader } from "react-spinners";
 import { computeExtTokenIdentifier } from "../Utils/tid";
 import { MARKETPLACE_CANISTER } from "../Utils/constants";
 import useFecth from "../Utils/useFecth";
-
+import { useAgent } from "@nfid/identitykit/react";
+import { createActor } from "../Utils/createActor";
+import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 const ListNFT = ({ nft }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrice, setNewPrice] = useState(0);
@@ -14,6 +16,7 @@ const ListNFT = ({ nft }) => {
 
 
 const {invalidateListings} = useFecth()
+const authenticatedAgent = useAgent()
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -34,10 +37,7 @@ const {invalidateListings} = useFecth()
     queryKey: ["nftActor"],
   });
 
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
+ 
 
   const { mutateAsync: HandleList } = useMutation({
     mutationFn: (e) => handleList(e),
@@ -52,6 +52,15 @@ const {invalidateListings} = useFecth()
 
   const handleList = async (e) => {
     e.preventDefault()
+
+    let marketplaceActor = createActor(
+      MARKETPLACE_CANISTER,
+      marketIDL,
+      authenticatedAgent
+    );
+
+
+
     if (!marketplaceActor || !userPrincipal || !nftActor) return;
 
     if (newPrice == 0) {

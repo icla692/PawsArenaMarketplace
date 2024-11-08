@@ -19,7 +19,7 @@ const CollectionDetails = () => {
     const [collectionData, setCollectionData] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortPrice, setSortPrice] = useState("lowtohigh");
-    const [listedFilter, setListedFilter] = useState("all");
+    const [listedFilter, setListedFilter] = useState("listed");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +54,12 @@ const CollectionDetails = () => {
             // if (!collectionID) return;
             setIsLoading(true);
 
+            let data = JSON.parse(localStorage.getItem("bulkData"))
+            let data2 = JSON.parse(localStorage.getItem("bulkData"))
+
+            console.log("here is the data :",data2);
+            
+
             console.log("xxxxxxxx :",collectionDetails,bulkData);
             
             try {
@@ -81,10 +87,10 @@ const CollectionDetails = () => {
                
                
                 // Combine results
-                
+                 const combinedListings = [...nftIds];
 
-                    const combinedListings = [...tokenListings[1]?.listings, ...nftIds];
-                    setListedNfts(combinedListings);
+                //const combinedListings = [...tokenListings[1]?.listings, ...nftIds];
+                setListedNfts(combinedListings);
                 // Fetch additional stats and tokens
                 // const nftStats = await nftActor.stats();
                 // const allTokensResponse = await nftActor.getTokens();
@@ -158,39 +164,39 @@ const CollectionDetails = () => {
     
         // Filter based on searchQuery
         if (searchQuery) {
-            filteredProducts = filteredProducts.filter(nft =>
+            filteredProducts = filteredProducts?.filter(nft =>
                 nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
     
         // Apply the listedFilter
         if (listedFilter === "listed") {
-            filteredProducts = filteredProducts.filter(nft => 
+            filteredProducts = filteredProducts?.filter(nft => 
                 nft[1]?.hasOwnProperty('price')
             );
         } else if (listedFilter === "all") {
             // If listedFilter is "all", we could reset to allTokens if needed
-            filteredProducts = [...allTokens];
+            filteredProducts = allTokens;
             console.log("all tokens :",allTokens);
             
         }
     
         // Apply price filtering if minPrice or maxPrice is set
         if (minPrice) {
-            filteredProducts = filteredProducts.filter(nft =>
+            filteredProducts = filteredProducts?.filter(nft =>
                 Number(nft[1]?.price) / 1e8 >= parseFloat(minPrice)
             );
         }
     
         if (maxPrice) {
-            filteredProducts = filteredProducts.filter(nft =>
+            filteredProducts = filteredProducts?.filter(nft =>
                 Number(nft[1]?.price) / 1e8 <= parseFloat(maxPrice)
             );
         }
     
         // Apply sorting based on sortPrice
         if (sortPrice) {
-            filteredProducts.sort((a, b) =>
+            filteredProducts?.sort((a, b) =>
                 sortPrice === "lowtohigh"
                     ? Number(a[1].price) - Number(b[1].price)
                     : Number(b[1].price) - Number(a[1].price)
@@ -201,12 +207,14 @@ const CollectionDetails = () => {
         const startIndex = currentPage * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         
-        return filteredProducts.slice(startIndex, endIndex).map((nft, index) => (
+        console.log("hhhhhhhhhhhhhhhhhh:",filteredProducts);
+        
+        return filteredProducts?.slice(startIndex, endIndex).map((nft, index) => (
             <Card key={index} nft={nft} collectionID={collectionID} />
         ));
     }, [listedNfts, allTokens, searchQuery, sortPrice, listedFilter, minPrice, maxPrice, currentPage]);
     // Calculate total pages based on all tokens
-    const totalPages = Math.ceil(allTokens.length / itemsPerPage);
+    const totalPages = Math.ceil(allTokens?.length / itemsPerPage);
 
     return (
         <>

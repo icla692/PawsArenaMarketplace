@@ -9,10 +9,10 @@ import pawsarena from "../assets/pawsarena.png";
 import { useIdentityKit } from "@nfid/identitykit/react";
 
 const style = {
-  wrapper: `bg-[#04111d] fixed z-50 w-full px-[1.2rem] md:px-[4.2rem] py-[0.8rem] flex items-center justify-between top-0 `,
+  wrapper: ` bg-[#121212] fixed z-50 w-full gap-[80px] px-[1.2rem] md:px-[4.2rem] py-[0.8rem] flex items-center justify-between top-0`,
   logoContainer: `flex items-center cursor-pointer`,
   logoText: `ml-[0.8rem] text-white font-semibold text-xl md:text-2xl`,
-  searchBar: `hidden md:flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#4c505c]`,
+  searchBar: `hidden md:flex w-[100px]  flex-1 mx-[0.8rem] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#4c505c]`,
   searchIcon: `text-[#8a939b] mx-3 font-bold text-lg`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   headerItems: `hidden md:flex items-center justify-end`,
@@ -33,17 +33,8 @@ const Navbar = () => {
 
   const {
     agent,
-    isInitializing,
     user,
-    isUserConnecting,
-    icpBalance,
-    signer,
-    identity,
-    delegationType,
-    accounts,
-    connect,
     disconnect,
-    fetchIcpBalance,
   } = useIdentityKit();
 
 
@@ -84,27 +75,30 @@ const Navbar = () => {
   return (
     <div className={style.wrapper}>
       <div className={style.logoContainer}>
-        <img src={pawsarena} height={40} width={40} alt="Logo" />
-        <div
+        <img
+                  onClick={() => navigate("/")}
+
+         src={pawsarena} height={70} width={70} alt="Logo" />
+        {/* <div
           onClick={() => navigate(userPrincipal ? "/dashboard" : "/")}
           className={style.logoText}
         >
           Paws Arena
-        </div>
+        </div> */}
       </div>
-      {/* <div className={style.searchBar}>
+      <div className={style.searchBar}>
         <div className={style.searchIcon}>
           <AiOutlineSearch />
         </div>
         <input
           className={style.searchInput}
-          placeholder="Search items, collections, and accounts"
+          placeholder="Search collections,nfts, names and traits"
         />
-      </div> */}
+      </div>
       <div className="md:hidden">
         <GiHamburgerMenu
           className="cursor-pointer"
-          onClick={toggleMenu}
+          onClick={()=>toggleMenu}
           color="white"
         />
       </div>
@@ -116,9 +110,9 @@ const Navbar = () => {
           
           Marketplace
         </div> */}
-        {/* <div className={style.headerItem}> Stats </div> */}
+        <div className={style.headerItem}> Home </div>
         {/* <div className={style.headerItem}> Resources </div> */}
-        {/* <div className={style.headerItem}> Support </div> */}
+        <div className={style.headerItem}> About </div>
         <div className={style.headerIcon} onClick={toggleDropdown}>
           {user?.principal ? <CgProfile /> : <Login />}
         </div>

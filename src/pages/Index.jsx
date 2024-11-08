@@ -5,8 +5,7 @@ import Hero from './Hero'
 const Index = () => {
   return (
     <>
-    <Hero/>
-    <Home/>
+    {/* <Home/> */}
     </>
   )
 }

@@ -4,6 +4,7 @@ import useFetch from "../Utils/useFecth"; // Fixed typo in import
 import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { Principal } from "@dfinity/principal";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 
 const TransferICP = () => {
   // State variables
@@ -15,7 +16,8 @@ const TransferICP = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
-
+const {user} = useIdentityKit()
+const authenticatedAgent = useAgent()
   // Fetch data using React Query
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } = useFetch();
 
@@ -51,7 +53,7 @@ const TransferICP = () => {
     e.preventDefault();
     setButtonLoading(true);
 
-    if (!IcpActor) return;
+    if (!IcpActor) {alert("dd");return};
 
     try {
       

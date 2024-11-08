@@ -24,9 +24,7 @@ const Login = () => {
   const agent = useAgent();
 
   const {
-   
     connect,
-   
   } = useIdentityKit();
 
   //  console.log("wewewewe :",icpBalance,accounts,user);
