@@ -25,7 +25,7 @@ import pic18 from "../assets/pic18.png";
 import { idlFactory as ICPDL } from "../Utils/icptoken.did";
 import { useNavigate } from "react-router-dom";
 import { HttpAgent } from "@dfinity/agent";
-import { ClipLoader } from "react-spinners";
+import { BarLoader, ClipLoader,DotLoader } from "react-spinners";
 const Home = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -78,7 +78,7 @@ const [isLoading,setIsLoading] = useState(false)
         principal: user?.principal,
       }).toHex();
 
-      console.log("dddd2323 90 :", accID, user?.principal?.toString());
+      // console.log("dddd2323 90 :", accID, user?.principal?.toString());
       let tokens = await nftActor.tokens(accID);
 
       if (tokens.ok) {
@@ -92,6 +92,8 @@ const [isLoading,setIsLoading] = useState(false)
         ["userPrincipal"],
         user?.principal?.toString()
       );
+
+      
       await queryClient.setQueryData(["userAccountId"], accountIdentifier);
       await queryClient.setQueryData(["userIcpBalance"], Number(balance) / 1e8);
       await queryClient.setQueryData(["IcpActor"], icpActor);
@@ -99,7 +101,7 @@ const [isLoading,setIsLoading] = useState(false)
       await queryClient.setQueryData(["marketplaceActor"], marketplaceActor);
       await queryClient.setQueryData(["loginAgent"], agent);
       await queryClient.setQueryData(["allListings"], allListings.data[0]);
-      console.log("done");
+      // console.log("done");
     } catch (error) {
       console.log("error in loading data :", error);
     }
@@ -234,7 +236,6 @@ setIsLoading(true)
       <div className="flex flex-col w-full">
         <div className="p-4 md:px-20 flex mt-[80px] md:mt-[100px] flex-col items-center justify-center gap-1">
           <div
-            //  style={{ fontFamily: "fantasy" }}
             className="text-5xl  md:text-8xl uppercase "
           >
             PawsArena
@@ -269,10 +270,9 @@ setIsLoading(true)
             <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                 {[pic17, pic11, pic13, pic18].map((pic, index) => (
                     <div key={index} className="relative">
-                        {/* Loader that appears based on isLoading state */}
                         {isLoading && (
                             <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 rounded-xl">
-                                <ClipLoader color="#36d7b7" loading={true} size={50} />
+                           <BarLoader loading={true} size={30} color="#36d7b7"/>
                             </div>
                         )}
                         <img

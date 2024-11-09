@@ -7,7 +7,8 @@ import { useAgent } from "@nfid/identitykit/react";
 import { MARKETPLACE_CANISTER } from "../Utils/constants";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { createActor } from "../Utils/createActor";
-const UnlistUpdate = ({ nft }) => {
+import { useNavigate } from "react-router-dom";
+const UnlistUpdate = ({ nft,handleTrigger }) => {
 
   const [newPrice, setNewPrice] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +21,7 @@ const UnlistUpdate = ({ nft }) => {
 
   const { invalidateListings, invalidateUserNfts } = useFecth();
   const authenticatedAgent = useAgent()
-
+const navigate = useNavigate()
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
     setModalType(_type);
@@ -63,6 +64,8 @@ const UnlistUpdate = ({ nft }) => {
       } else {
         displayNotificationModal(res?.error_text, "error");
       }
+      handleTrigger()
+      navigate("/profile")
       console.log("unlisting res :", res);
     } catch (error) {
       console.log("error in unlisting token :", error);

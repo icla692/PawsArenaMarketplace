@@ -4,31 +4,20 @@ import useFecth from "../Utils/useFecth";
 import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { computeExtTokenIdentifier } from "../Utils/tid";
-import { MARKETPLACE_CANISTER } from "../Utils/constants";
+import { MARKETPLACE_CANISTER, PAWS_ARENA_CANISTER } from "../Utils/constants";
 import { Principal } from "@dfinity/principal";
-
-const TransferNFT = ({ nft }) => {
+import { createActor } from "../Utils/createActor";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { idlFactory as PawsIDL } from "../Utils/paws.did";
+const TransferNFT = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPreviewOpen,setPreviewOpen] = useState(false)
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
   const [recipient, setRecipient] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
 
-
-  const { data: userPrincipal } = useQuery({
-    queryKey: ["userPrincipal"],
-  });
-
-  const { data: nftActor } = useQuery({
-    queryKey: ["nftActor"],
-  });
-
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
-  
-  const {invalidateListings} = useFecth()
-
+  const { invalidateListings } = useFecth();
+  const authenticatedAgent = useAgent();
+  const { user } = useIdentityKit();
   //modals for the notification popup
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -42,61 +31,60 @@ const TransferNFT = ({ nft }) => {
     setTimeout(() => setShowModal(false), 3000);
   };
 
-
   const { mutateAsync: HandleTransfer } = useMutation({
     mutationFn: (e) => handleTransfer(e),
     onSuccess: async () => {
-       invalidateListings()
+      invalidateListings();
       setButtonLoading(false);
     },
   });
 
-
-  const handleTransfer = async (e)=>{
-    e.preventDefault()
+  const handleTransfer = async (e) => {
+    e.preventDefault();
     setButtonLoading(true);
+    console.log("nft :", nft);
 
-    console.log("nft :",nft);
-    
-    if(!nftActor || !nft) displayNotificationModal("please login first","success")
+    let nftActor = createActor(
+      PAWS_ARENA_CANISTER,
+      PawsIDL,
+      authenticatedAgent
+    );
+
+    if (!nftActor || !nft)
+      displayNotificationModal("please login first", "success");
     //get the token identifier of the nft
-let tokenIdentifier = computeExtTokenIdentifier(Number(nft.nftid),nft.canister_id)
+    let tokenIdentifier = computeExtTokenIdentifier(
+      Number(nft.nftid),
+      nft.canister_id
+    );
 
-//should create an ft canister instance but for now use the ic kitties
+    //should create an ft canister instance but for now use the ic kitties
 
-let transferResults = await nftActor.transfer({
-    amount: parseInt(1),
-        from: { principal: Principal.fromText(userPrincipal) }, 
-        memo: [],
-        notify: false,
-        subaccount: [],
-        to: { address: recipient },
-        token: tokenIdentifier,
-})
+    let transferResults = await nftActor.transfer({
+      amount: parseInt(1),
+      from: { principal: user.principal },
+      memo: [],
+      notify: false,
+      subaccount: [],
+      to: { address: recipient },
+      token: tokenIdentifier,
+    });
 
-if (transferResults.ok) {
-  displayNotificationModal("NFT transfer successful", "success");
-} else {
-  displayNotificationModal(transferResults.err, "error");
-}
+    if (transferResults.ok) {
+      displayNotificationModal("NFT transfer successful", "success");
+    } else {
+      displayNotificationModal(transferResults.err, "error");
+    }
 
+    handleTrigger();
 
+    console.log("transfer success", transferResults);
+  };
 
-
-
-
-    console.log("transfer success",transferResults);
-    
-
-  }
-
-  
   return (
     <div className="relative flex-row gap-1 flex w-full bg-[#2E8DEE] font-bold text-white justify-center items-center p-2 ">
       <button onClick={() => setIsModalOpen(true)}>Transfer</button>
-     
-     
-     
+
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           {showModal && (
@@ -121,7 +109,7 @@ if (transferResults.ok) {
               />
             </div>
 
-            <form onSubmit={(HandleTransfer)}>
+            <form onSubmit={HandleTransfer}>
               <input
                 type="text"
                 id="recipient"
@@ -147,12 +135,7 @@ if (transferResults.ok) {
           </div>
         </div>
       )}
-     
-     
-     
-     
-     
-      </div>
+    </div>
   );
 };
 

@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import { computeExtTokenIdentifier } from "../Utils/tid";
-import { MARKETPLACE_CANISTER } from "../Utils/constants";
+import { MARKETPLACE_CANISTER, PAWS_ARENA_CANISTER } from "../Utils/constants";
 import useFecth from "../Utils/useFecth";
-import { useAgent } from "@nfid/identitykit/react";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { createActor } from "../Utils/createActor";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
-const ListNFT = ({ nft }) => {
+import { idlFactory as PawsIDL } from "../Utils/paws.did";
+const ListNFT = ({ nft,handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrice, setNewPrice] = useState(0);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -33,10 +34,7 @@ const authenticatedAgent = useAgent()
     queryKey: ["userPrincipal"],
   });
 
-  const { data: nftActor } = useQuery({
-    queryKey: ["nftActor"],
-  });
-
+  const {user} = useIdentityKit()
  
 
   const { mutateAsync: HandleList } = useMutation({
@@ -59,9 +57,9 @@ const authenticatedAgent = useAgent()
       authenticatedAgent
     );
 
+    let nftActor = createActor(PAWS_ARENA_CANISTER,PawsIDL,authenticatedAgent)
 
-
-    if (!marketplaceActor || !userPrincipal || !nftActor) return;
+    if (!marketplaceActor || !user || !nftActor || !nft) return;
 
     if (newPrice == 0) {
       alert("price is zero");
@@ -73,7 +71,7 @@ const authenticatedAgent = useAgent()
     try {
       // Call the init function on the marketplace with specified price
       let initRes = await marketplaceActor?.init_list_nft(
-        Principal.fromText(userPrincipal),
+        user.principal,
         nft.nftid,
         { Kitties: null },
         parseInt(newPrice * 1e8) // Convert ICP to subunits
@@ -86,7 +84,7 @@ const authenticatedAgent = useAgent()
       );
       let transferRes = await nftActor.transfer({
         amount: parseInt(1),
-        from: { principal: Principal.fromText(userPrincipal) },
+        from: { principal: user.principal },
         memo: [],
         notify: false,
         subaccount: [],
@@ -97,7 +95,7 @@ const authenticatedAgent = useAgent()
       console.log("transfer result:", transferRes);
 
       let res = await marketplaceActor.complete_listing(
-        Principal.fromText(userPrincipal),
+        user?.principal,
         nft.nftid,
         { Kitties: null }
       );
@@ -116,6 +114,7 @@ const authenticatedAgent = useAgent()
     } catch (error) {
       console.log("Error in listing NFT:", error);
     }
+    handleTrigger()
   };
 
   return (

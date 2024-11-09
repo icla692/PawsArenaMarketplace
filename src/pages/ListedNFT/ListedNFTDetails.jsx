@@ -238,7 +238,7 @@ const ListedNFTDetails = () => {
                   nftDetails?.seller_principal?.toString() ?(
                   <div className="flex flex-row gap-4 justify-center items-center w-full">
                     <UnlistUpdate nft={nftDetails} />
-                    <UpdatePrice nft={nftDetails} handleTrigger={handleTrigger} />
+                    <UpdatePrice nft={nftDetails?.token_identifier} handleTrigger={handleTrigger} />
                   </div>
                 ) : (
                   <div className="flex flex-row gap-4 w-full">

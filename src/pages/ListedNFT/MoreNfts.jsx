@@ -18,7 +18,7 @@ const MoreNfts = ({ collectionID, nftID, nftPrice,nftDetails }) => {
         console.log(" gg sd :",myTokens);
         
         let rangePrice = myTokens
-          ?.slice(Math.ran, 4);
+          ?.slice(0, 4);
           
           // .filter(
           //   (nft) =>

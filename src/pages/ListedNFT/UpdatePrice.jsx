@@ -3,19 +3,21 @@ import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../../Utils/useFecth";
+import { createActor } from "../../Utils/createActor";
+import { MARKETPLACE_CANISTER } from "../../Utils/constants";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 
-const UpdatePrice = ({ nft,handleTrigger }) => {
+const UpdatePrice = ({ nft, handleTrigger }) => {
   // console.log("update price :", nft);
 
   const [updateModal, setUpdateModal] = useState(false);
   const [newPrice, setNewPrice] = useState("");
   const [updateloading, setUpdateLoading] = useState(false);
-const {invalidateListings} = useFecth()
-const [listbuttonLoading,setListButtonLoading] = useState(false)
-
-
-
-
+  const { invalidateListings } = useFecth();
+  const [listbuttonLoading, setListButtonLoading] = useState(false);
+  const authenticatedAgent = useAgent();
+  const { user } = useIdentityKit();
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -28,41 +30,34 @@ const [listbuttonLoading,setListButtonLoading] = useState(false)
     setTimeout(() => setShowModal(false), 3000);
   };
 
-
-
-
-
-
-
-
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
-
-
   const { mutateAsync: HandleUpdatePrice } = useMutation({
     mutationFn: (e) => handleUpdatePrice(e),
     onSuccess: async () => {
       invalidateListings();
-      // setButtonLoading(false);
     },
   });
 
-
-    const handleUpdatePrice = async (e) => {
+  const handleUpdatePrice = async (e) => {
     e.preventDefault();
 
-    console.log("new price : ", newPrice);
+    let marketplaceActor = createActor(
+      MARKETPLACE_CANISTER,
+      marketIDL,
+      authenticatedAgent
+    );
 
-    if(!marketplaceActor){       displayNotificationModal("login first", "error");return};
+    console.log("new price : ", newPrice,nft);
 
+    if (!marketplaceActor) {
+      displayNotificationModal("login first", "error");
+      return;
+    }
 
-    if (!newPrice || newPrice == 0) return;
+    if (!newPrice || newPrice == 0 || !nft) return;
     setListButtonLoading(true);
-    setUpdateLoading(true)
+    setUpdateLoading(true);
     let res = await marketplaceActor?.update_nft_price(
-      nft.token_identifier,
+      nft,
       parseInt(newPrice * 1e8)
     );
 
@@ -73,36 +68,26 @@ const [listbuttonLoading,setListButtonLoading] = useState(false)
     }
 
     // console.log("update price results :", res);
-    handleTrigger()
+    handleTrigger();
     setListButtonLoading(false);
-    setUpdateLoading(false)
+    setUpdateLoading(false);
   };
-
-
-
-
-
-
-
-
-
-
 
   return (
     <div className="flex flex-col gap-1 w-1/2">
       {showModal && (
-            <div
-              className={`absolute text-xs top-5 z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
-                modalType === "success"
-                  ? "bg-green-100 text-green-800 border border-green-300 rounded-lg p-1 animate-slide-in"
-                  : "bg-red-100 text-red-800 border border-red-300 rounded-lg p-1 animate-slide-in"
-              }`}
-            >
-              <div className="modal-message">
-                <p>{modalMessage}</p>
-              </div>
-            </div>
-          )}
+        <div
+          className={`absolute text-xs top-5 z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
+            modalType === "success"
+              ? "bg-green-100 text-green-800 border border-green-300 rounded-lg p-1 animate-slide-in"
+              : "bg-red-100 text-red-800 border border-red-300 rounded-lg p-1 animate-slide-in"
+          }`}
+        >
+          <div className="modal-message">
+            <p>{modalMessage}</p>
+          </div>
+        </div>
+      )}
       <button
         className="flex bg-[#6fa0d1] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
         onClick={() => setUpdateModal(true)}

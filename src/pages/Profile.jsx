@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeCanvas as QRCode } from "qrcode.react";
 import pawsarena from "../assets/pawsarena.png"; // Placeholder for profile picture
 import { AiOutlineCopy } from "react-icons/ai"; // Import copy icon
@@ -36,8 +36,8 @@ const style = {
 const Profile = () => {
   const [userNFTList, setuserNFTList] = useState(null);
   const [userAccount, setUserAccount] = useState(null);
-  const [trigger,setTrigger] = useState("")
-  const {user} = useIdentityKit()
+  const [trigger, setTrigger] = useState("");
+  const { user } = useIdentityKit();
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
   });
@@ -54,11 +54,10 @@ const Profile = () => {
     queryKey: ["nftActor"],
   });
 
-  const { data: userNFTS } = useQuery({
-    queryKey: ["userNFTS"],
-  });
+  //  console.log("xcxcxcx :",userNFTS);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!userPrincipal) return;
@@ -87,8 +86,7 @@ const Profile = () => {
           res.data[0].length > 0
         ) {
           for (const data of res.data[0]) {
-            if(data.isConfirmed === true){
-
+            if (data.isConfirmed === true) {
               NFTArray.push({
                 nftid: data.nft_id,
                 type: "Listed",
@@ -119,8 +117,6 @@ const Profile = () => {
             });
           }
         }
-        console.log("aaaaa :", NFTArray);
-
         setuserNFTList(NFTArray);
       } catch (error) {
         console.log("error in fetching user listed NFTs", error);
@@ -128,24 +124,21 @@ const Profile = () => {
     };
 
     fetchUserListedNFTS();
-  }, [userPrincipal, marketplaceActor, nftActor, userNFTS,trigger]);
-
+  }, [user, trigger]);
 
   const handleTrigger = (e) => setTrigger(Math.random());
-
-
 
   const handleCopyAddress = (userAddress) => {
     navigator.clipboard.writeText(userAddress);
     alert("Address copied to clipboard!");
   };
 
-  const shortenAddress = (address,nom) => {
+  const shortenAddress = (address, nom) => {
     return `${address.slice(0, nom)}...${address.slice(-7)}`;
   };
 
   // console.log("user here :",user?.principal?.toString());
-  
+
   return (
     <>
       {user?.principal ? (
@@ -153,20 +146,32 @@ const Profile = () => {
           <div className={style.profileSection}>
             <div className="flex flex-row items-center justify-between gap-4">
               <div className="">
-                { shortenAddress(user?.principal?.toString(),20)}
+                {shortenAddress(user?.principal?.toString(), 20)}
               </div>
               <AiOutlineCopy
-                onClick={()=>handleCopyAddress(user?.principal?.toText())}
-                
+              className="cursor-pointer hover:text-lg"
+                onClick={() => handleCopyAddress(user?.principal?.toText())}
               />
             </div>
             <div className={style.addressContainer}>
               <div className>
-                {user && shortenAddress(AccountIdentifier.fromPrincipal({principal:user.principal})?.toHex(),18)}
+                {user &&
+                  shortenAddress(
+                    AccountIdentifier.fromPrincipal({
+                      principal: user.principal,
+                    })?.toHex(),
+                    18
+                  )}
               </div>
               <AiOutlineCopy
-                onClick={()=>handleCopyAddress(AccountIdentifier.fromPrincipal({principal:user.principal})?.toHex())}
-                className="cursor-pointer text-lg hover:text-blue-500"
+                onClick={() =>
+                  handleCopyAddress(
+                    AccountIdentifier.fromPrincipal({
+                      principal: user.principal,
+                    })?.toHex()
+                  )
+                }
+                className="cursor-pointer text-lg hover:text-lg"
               />
             </div>
             <TransferICP />
@@ -214,23 +219,27 @@ const Profile = () => {
                     </div>
                     {nft.type == "Owned" ? (
                       <div className="flex flex-row mt-4 gap-2 justify-center items-center">
-                        <ListNFT nft={nft} />
-                        <TransferNFT nft={nft} />
+                        <ListNFT nft={nft} handleTrigger={handleTrigger} />
+                        <TransferNFT nft={nft} handleTrigger={handleTrigger} />
                       </div>
                     ) : (
                       <div className="flex flex-row p-1 gap-4 justify-center items-center">
-
-                      <UnlistUpdate
-                        nft={computeExtTokenIdentifier(
-                          nft.nftid,
-                          nft.canister_id
-                        )}
+                        <UnlistUpdate
+                          nft={computeExtTokenIdentifier(
+                            nft.nftid,
+                            nft.canister_id
+                          )}
+                          handleTrigger={handleTrigger}
                         />
-                    <UpdatePrice nft={nft} handleTrigger={handleTrigger} />
-                    </div>
-                    )
-                    
-                    }
+                        <UpdatePrice
+                          nft={computeExtTokenIdentifier(
+                            nft.nftid,
+                            nft.canister_id
+                          )}
+                          handleTrigger={handleTrigger}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
