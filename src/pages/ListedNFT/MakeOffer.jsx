@@ -163,6 +163,10 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
           </div>
         </div>
       )}
+
+
+
+      
     </div>
   );
 };
