@@ -1,12 +1,15 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { computeExtTokenIdentifier } from "../../Utils/tid";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import { HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../../Utils/paws.did";
-import { MARKETPLACE_CANISTER } from "../../Utils/constants";
+import {
+  MARKETPLACE_CANISTER,
+  PAWS_ARENA_CANISTER,
+} from "../../Utils/constants";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { createActor } from "../../Utils/createActor";
 import { IoEyeSharp } from "react-icons/io5";
@@ -21,6 +24,7 @@ import { Principal } from "@dfinity/principal";
 import UnlistUpdate from "../Unlist";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./UpdatePrice";
+import { idlFactory as PawsIDL } from "../../Utils/paws.did";
 const style = {
   wrapper: `flex gap-3 mt-[80px] flex-col md:flex-row justify-center bg-[#121212] h-screen p-4 text-white`,
   leftwrapper: `flex flex-col  items-center md:items-start  mb-4 md:mb-0`,
@@ -51,6 +55,10 @@ const ListedNFTDetails = () => {
   const { data: bulkData } = useQuery({
     queryKey: ["bulkData"],
   });
+
+  // const { data: nftActor } = useQuery({
+  //   queryKey: ["nftActor"],
+  // });
 
   const HOST =
     process.env.DFX_NETWORK !== "ic"
@@ -83,10 +91,15 @@ const ListedNFTDetails = () => {
       try {
         if (!colID || !nftID) return;
 
-        setButtonLoading(true)
+        setButtonLoading(true);
 
         let tokenIdentifier = computeExtTokenIdentifier(nftID, colID);
         // let nftInfo = myTokens?.filter((nft) => nft[0] == nftID);
+
+        let nftActor = createActor(PAWS_ARENA_CANISTER, PawsIDL, agent);
+
+        // let res = await nftActor?.getMergedSVG(Number(nftID));
+        // console.log("res for the vector svg :", res);
 
         const nftInfo = myTokens?.find((nft) => nft[0] == nftID);
         let markTrans = await marketActor?.get_nft_sale_history(
@@ -127,7 +140,7 @@ const ListedNFTDetails = () => {
         console.log("error in fetching details :", error);
       }
 
-      setButtonLoading(false)
+      setButtonLoading(false);
     };
 
     fetchDetails();
@@ -146,9 +159,7 @@ const ListedNFTDetails = () => {
     e.preventDefault();
     if (!nftDetails) return;
     setButtonLoading(true);
-    // if(!window.confirm("Unlist NFT from marketplace:")) return
-    //     displayNotificationModal("NFT unlisted successfully", "success");
-    // return
+ 
     try {
       let res = await marketplaceActor.un_list_nft(nftDetails.token_identifier);
       console.log("unlisting res :", res);
@@ -195,7 +206,7 @@ const ListedNFTDetails = () => {
   };
 
   return (
-    <div className="flex w-full h-full gap-4 flex-col text-white mr-6 pr-6 md:px-20 mt-[80px]">
+    <div className="flex w-full min-h-screen gap-4 flex-col text-white mr-6 pr-6 md:px-20 mt-[100px]">
       <div className="flex w-full h-full flex-col md:flex-row gap-2 mx-4">
         <div className="flex flex-col gap-4 w-full md:w-1/2 h-full md:items-start  mb-4 md:mb-0">
           <div className="rounded-lg p-1 w-full flex border border-gray-400 pt-3 flex-col">
@@ -208,6 +219,8 @@ const ListedNFTDetails = () => {
               className={style.nftImg}
             />
           </div>
+      
+
           <div className="flex flex-col w-full items-start">
             <h1>Traits</h1>
             <span className="text-sm">Coming Soon ...</span>
@@ -230,15 +243,17 @@ const ListedNFTDetails = () => {
                 <h3>Current Price</h3>
                 <span className="text-[25px]">
                   {nftDetails &&
-                    (Number(nftDetails?.nft_price) / 1e8).toFixed(2)}
-                  ICP
+                    (Number(nftDetails?.nft_price) / 1e8).toFixed(2)} {" "}ICP
                 </span>
-                {
-                user && user.principal.toString() ==
-                  nftDetails?.seller_principal?.toString() ?(
+                {user &&
+                user.principal.toString() ==
+                  nftDetails?.seller_principal?.toString() ? (
                   <div className="flex flex-row gap-4 justify-center items-center w-full">
-                    <UnlistUpdate nft={nftDetails} />
-                    <UpdatePrice nft={nftDetails?.token_identifier} handleTrigger={handleTrigger} />
+                    <UnlistUpdate nft={nftDetails?.token_identifier} />
+                    <UpdatePrice
+                      nft={nftDetails?.token_identifier}
+                      handleTrigger={handleTrigger}
+                    />
                   </div>
                 ) : (
                   <div className="flex flex-row gap-4 w-full">
@@ -252,9 +267,7 @@ const ListedNFTDetails = () => {
                       handleTrigger={handleTrigger}
                     />
                   </div>
-                )
-                
-                }
+                )}
               </div>
 
               <SaleHistory history={saleHistory} />

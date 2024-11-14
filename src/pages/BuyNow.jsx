@@ -1,13 +1,19 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { MARKETPLACE_CANISTER } from "../Utils/constants";
+import {
+  MARKETPLACE_CANISTER,
+  MY_LEDGER_CANISTER_ID,
+} from "../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../Utils/useFecth";
 import { useNavigate } from "react-router-dom";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { createActor } from "../Utils/createActor";
+import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
+import { idlFactory as ICPDL } from "../Utils/icptoken.did";
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
- 
   const [isLoading, setIsLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +21,10 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   const [modalType, setModalType] = useState(""); // "success" or "error"
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =
     useFecth();
+
+  const authenticatedAgent = useAgent();
+  const { user } = useIdentityKit();
+
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
     setModalType(_type);
@@ -22,35 +32,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     setTimeout(() => setShowModal(false), 3000);
   };
 
-  const { data: userPrincipal } = useQuery({
-    queryKey: ["userPrincipal"],
-  });
-
-  const { data: userIcpBalance } = useQuery({
-    queryKey: ["userIcpBalance"],
-  });
-
-  const { data: allListings } = useQuery({
-    queryKey: ["allListings"],
-  });
-
-  const { data: userNFTS } = useQuery({
-    queryKey: ["userNFTS"],
-  });
-
-  const { data: nftActor } = useQuery({
-    queryKey: ["nftActor"],
-  });
-
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
-  const { data: IcpActor } = useQuery({
-    queryKey: ["IcpActor"],
-  });
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { mutateAsync: HandleBuy } = useMutation({
     mutationFn: () => handleBuy(),
     onSuccess: async () => {
@@ -63,11 +45,22 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
 
   const handleBuy = async () => {
     try {
-      if (!marketplaceActor) {
-        alert("Log in first to purchase this NFT")
+      if (!user || !authenticatedAgent) {
         displayNotificationModal("Log in first to purchase this NFT", "error");
-        return};
-      // if (!window.confirm("buy this nft?")) return;
+        return;
+      }
+
+      let marketplaceActor = createActor(
+        MARKETPLACE_CANISTER,
+        marketIDL,
+        authenticatedAgent
+      );
+
+      const IcpActor = createActor(
+        MY_LEDGER_CANISTER_ID,
+        ICPDL,
+        authenticatedAgent
+      );
 
       setIsLoading(true);
       //approve the marketplace to transfer funds on the user/s behalf
@@ -98,7 +91,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     } catch (error) {
       console.log("error in buying nft :", error);
     }
-    navigate("/profile")
+    navigate("/profile");
   };
 
   return (
@@ -120,19 +113,8 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
       <button
         onClick={() => HandleBuy()}
         className="flex w-full bg-[#2E8DEE] rounded-b-lg mt-4 font-bold text-white justify-center items-center p-2"
-        //  disabled={nft_price != undefined && userP == userPrincipal}
       >
-        {isLoading ? (
-          <ClipLoader size={20} color="white" />
-        ) : 
-        // userP == userPrincipal ? (
-        //   "View"
-        // )
-        
-  
-          "Buy"
-        // ) :""
-      }
+        {isLoading ? <ClipLoader size={20} color="white" /> : "Buy"}
       </button>
     </>
   );

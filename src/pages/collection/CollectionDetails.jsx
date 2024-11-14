@@ -218,7 +218,7 @@ const CollectionDetails = () => {
 
     return (
         <>
-            <div className="flex flex-col mx-4 md:mx-20 mt-50">
+            <div className="flex flex-col mx-4 min-h-screen md:mx-20 mt-50">
                 <Header collectionData={collectionData} isLoading={dataLoading} />
                 <Searchbar 
                     prevPage={prevPage}

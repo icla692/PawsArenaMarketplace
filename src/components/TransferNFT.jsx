@@ -82,8 +82,13 @@ const TransferNFT = ({ nft, handleTrigger }) => {
   };
 
   return (
-    <div className="relative flex-row gap-1 flex w-full bg-[#2E8DEE] font-bold text-white justify-center items-center p-2 ">
-      <button onClick={() => setIsModalOpen(true)}>Transfer</button>
+    <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
+      <button 
+
+className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+
+      
+      onClick={() => setIsModalOpen(true)}>Transfer</button>
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">

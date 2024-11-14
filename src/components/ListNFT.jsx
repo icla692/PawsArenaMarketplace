@@ -51,6 +51,9 @@ const authenticatedAgent = useAgent()
   const handleList = async (e) => {
     e.preventDefault()
 
+    
+    if ( !user || !nft || !authenticatedAgent) return;
+
     let marketplaceActor = createActor(
       MARKETPLACE_CANISTER,
       marketIDL,
@@ -59,7 +62,6 @@ const authenticatedAgent = useAgent()
 
     let nftActor = createActor(PAWS_ARENA_CANISTER,PawsIDL,authenticatedAgent)
 
-    if (!marketplaceActor || !user || !nftActor || !nft) return;
 
     if (newPrice == 0) {
       alert("price is zero");
@@ -82,7 +84,7 @@ const authenticatedAgent = useAgent()
         nft.nftid,
         nft.canister_id
       );
-      let transferRes = await nftActor.transfer({
+      let transferRes = await nftActor?.transfer({
         amount: parseInt(1),
         from: { principal: user.principal },
         memo: [],
@@ -94,7 +96,7 @@ const authenticatedAgent = useAgent()
 
       console.log("transfer result:", transferRes);
 
-      let res = await marketplaceActor.complete_listing(
+      let res = await marketplaceActor?.complete_listing(
         user?.principal,
         nft.nftid,
         { Kitties: null }
@@ -106,7 +108,7 @@ const authenticatedAgent = useAgent()
       // } else {
       //   alert(fin.status_error);
       // }
-      if (res.status == 200 && res.status_text == "Ok") {
+      if (res?.status == 200 && res?.status_text == "Ok") {
         displayNotificationModal("NFT listed successfully", "success");
       } else {
         displayNotificationModal(res.error_text, "error");
@@ -118,11 +120,15 @@ const authenticatedAgent = useAgent()
   };
 
   return (
-    <div className="relative flex-row gap-1 flex w-full bg-[#2E8DEE] font-bold text-white justify-center items-center p-2 ">
-      <button onClick={() => setIsModalOpen(true)}>List</button>
+    <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
+      <button 
+
+className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+      
+      onClick={() => setIsModalOpen(true)}>List</button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
           {showModal && (
             <div
               className={`absolute top-10 text-xs z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${

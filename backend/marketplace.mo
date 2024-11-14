@@ -45,6 +45,65 @@ actor class () = this {
         Text.hash,
     );
 
+//track the view for the different nfts
+    private stable var NftViews : [(Text, Nat)] = [];
+    private var NftViewsHashMap = HashMap.fromIter<Text, Nat>(
+        Iter.fromArray(NftViews),
+        Iter.size(Iter.fromArray(NftViews)),
+        Text.equal,
+        Text.hash,
+    );
+
+
+//save the nft views
+    public func save_nft_view(nft_id : Text) : async Text {
+        switch (NftViewsHashMap.get(nft_id)) {
+            case (?data) {
+                NftViewsHashMap.put(nft_id, data + 1);
+            };
+            case (null) {
+                NftViewsHashMap.put(nft_id, 1);
+            };
+        };
+        return "";
+    };
+
+    //get the nft views
+    public query func get_nft_views(nft_id : Text) : async Response<Nat> {
+        switch (NftViewsHashMap.get(nft_id)) {
+            case (?data) {
+                return {
+                    status = 200;
+                    status_text = "Ok";
+                    data = data;
+                    error_text = null;
+                };
+            };
+            case (null) {
+                return {
+                    status = 200;
+                    status_text = "Ok";
+                    data = 0;
+                    error_text = null;
+                };
+            };
+        };
+    };
+
+
+    //get all the nft views in the marketplace
+    public query func get_all_nft_views() : async Response<[(Text, Nat)]> {
+        let data = Iter.toArray<(Text, Nat)>(NftViewsHashMap.entries());
+        return {
+            status = 200;
+            status_text = "Ok";
+            data = ?data;
+            error_text = null;
+        };
+    };
+
+
+
     //get all transactions from the marketplace
     public query func salesTransactions() : async Response<[[SaleTransaction]]> {
         let allData = Iter.toArray<[SaleTransaction]>(TransactionsHashMap.vals());
@@ -972,11 +1031,27 @@ actor class () = this {
     system func preupgrade() {
         NftListings := Iter.toArray(NftListingHashMap.entries());
         SaleTransaction := Iter.toArray(TransactionsHashMap.entries());
+        NftViews := Iter.toArray(NftViewsHashMap.entries());
     };
 
     system func postupgrade() {
         NftListings := [];
         SaleTransaction := [];
+        NftViews := [];
     };
 
 };
+
+
+
+
+// [dependencies]
+// base = "0.11.2"
+// array = "https://github.com/aviate-labs/array.mo#v0.1.1"
+// encoding = "https://github.com/aviate-labs/encoding.mo#v0.3.1"
+// matchers = "https://github.com/kritzcreek/motoko-matchers#v1.2.0"
+// cap = "https://github.com/stephenandrews/cap-motoko-library#v1.0.4-alt"
+// fuzz = "0.2.1"
+
+// [dev-dependencies]
+// test = "2.0.0"

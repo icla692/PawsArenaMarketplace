@@ -8,11 +8,8 @@ import { MARKETPLACE_CANISTER } from "../Utils/constants";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { createActor } from "../Utils/createActor";
 import { useNavigate } from "react-router-dom";
-const UnlistUpdate = ({ nft,handleTrigger }) => {
-
-  const [newPrice, setNewPrice] = useState("");
+const UnlistUpdate = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [buttonLoading, setButtonLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -20,17 +17,15 @@ const UnlistUpdate = ({ nft,handleTrigger }) => {
   const [modalType, setModalType] = useState(""); // "success" or "error"
 
   const { invalidateListings, invalidateUserNfts } = useFecth();
-  const authenticatedAgent = useAgent()
-const navigate = useNavigate()
+  const authenticatedAgent = useAgent();
+  const navigate = useNavigate();
+
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
     setModalType(_type);
     setShowModal(true);
     setTimeout(() => setShowModal(false), 3000);
   };
-
- 
-
 
   const { mutateAsync: HandleList } = useMutation({
     mutationFn: () => handleUnlist(),
@@ -42,53 +37,42 @@ const navigate = useNavigate()
   });
 
   const handleUnlist = async () => {
-
     let marketplaceActor = createActor(
       MARKETPLACE_CANISTER,
       marketIDL,
       authenticatedAgent
     );
 
-
-
     if (!nft || !marketplaceActor) return;
     setButtonLoading(true);
 
     try {
-      console.log("unlist :",nft);
-      
+      console.log("unlist :", nft);
+
       let res = await marketplaceActor?.un_list_nft(nft);
 
-      if (res.status == 200 && res.status_text == "Ok") {
+      if (res?.status == 200 && res?.status_text == "Ok") {
         displayNotificationModal("NFT unlisted successfully", "success");
       } else {
         displayNotificationModal(res?.error_text, "error");
       }
-      handleTrigger()
-      navigate("/profile")
+      handleTrigger();
+      navigate("/profile");
       console.log("unlisting res :", res);
     } catch (error) {
       console.log("error in unlisting token :", error);
     }
   };
 
- 
-
   return (
     <div className="flex flex-col gap-1 w-1/2">
       <div className="flex flex-row gap-4">
         <button
-    className="flex bg-[#2c2d2e] rounded-lg w-full mt-4 font-bold text-white justify-center items-center p-2 cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
+          className="flex bg-[#2c2d2e] rounded-lg w-full mt-4 font-bold text-white justify-center items-center p-2 cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
         >
           Unlist
         </button>
-        {/* <button
-        className="flex bg-[#5e6163] w-1/2 rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
-        onClick={() => setIsModalOpen(true)}
-        >
-          Update
-        </button> */}
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">

@@ -63,18 +63,8 @@ const useFecth = () => {
   };
 
   const allUserNFTs = async () => {
-    console.log("iiiiiiiiiiiiiii");
-    
     if (user) {
-
       console.log("refetching user nfts");
-
-      // if(userNFTS){
-      //    queryClient.setQueryData(["userNFTS"], userNFTS);
-
-
-      // }
-      
       try {
         let NFTArray = [];
         for (const collection of NFTCollections) {
@@ -123,8 +113,8 @@ const useFecth = () => {
             }
           }
         }
-        await queryClient.setQueryData(["userNFTS"], NFTArray);
         console.log("refetch user nfts 2 :", NFTArray);
+        await queryClient.setQueryData(["userNFTS"], NFTArray);
 
         return [...NFTArray];
       } catch (error) {
@@ -166,7 +156,7 @@ const useFecth = () => {
         owner: Principal.fromText(userPrincipal),
         subaccount: [],
       });
-      console.log("refetching user balance");
+      console.log("refetching user balance :", Number(balance) / 1e8);
 
       await queryClient.setQueryData(["userIcpBalance"], Number(balance) / 1e8);
 

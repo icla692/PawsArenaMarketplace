@@ -13,7 +13,7 @@ const shortenAddress = (address) => {
 };
 
   return (
-    <div className="overflow-x-auto bg-[#1B1B1B] p-2 rounded-lg border border-gray-400">
+    <div className="overflow-x-auto bg-[#1B1B1B] p-2 rounded-lg border border-gray-400 h-[200px] md:h-[400px]">
       <h3 className='text-lg'>Activity</h3>
     <table className="min-w-full divide-y divide-gray-200">
         <thead className="">

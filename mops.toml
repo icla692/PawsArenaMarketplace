@@ -5,6 +5,7 @@ encoding = "https://github.com/aviate-labs/encoding.mo#v0.3.1"
 matchers = "https://github.com/kritzcreek/motoko-matchers#v1.2.0"
 cap = "https://github.com/stephenandrews/cap-motoko-library#v1.0.4-alt"
 fuzz = "0.2.1"
+test = "2.0.0"
 
 [dev-dependencies]
 test = "2.0.0"

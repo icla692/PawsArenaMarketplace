@@ -48,8 +48,6 @@ const Dashboard = () => {
               })}
           </div>
         ) : (
-          // <div className="flex px-4 text-white flex-wrap justify-center md:justify-start items-center gap-3">Please login first</div>
-
           navigate("/")
         )}
       </div>

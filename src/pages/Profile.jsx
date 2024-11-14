@@ -13,26 +13,26 @@ import TransferNFT from "../components/TransferNFT";
 import TransferICP from "../components/TransferICP";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./ListedNFT/UpdatePrice";
+import { ClipLoader } from "react-spinners";
 
 const style = {
-  wrapper: `flex mt-[80px] bg-[#121212] min-h-screen flex-col w-full items-center p-4 text-white`,
-  profileSection: `flex flex-col gap-1 justify-evenly items-center bg-[#212121] rounded-lg p-4 w-full max-w-4xl mb-6`,
-  profilePicture: `h-24 w-24 md:h-32 md:w-32 rounded-full border-2 border-[#8a939b] mb-4`,
+  wrapper: `flex mt-[80px] h-screen bg-[#121212] flex-col w-full items-center p-4 text-white`,
+  profileSection: `flex flex-col border rounded-lg w-full max-w-2xl mb-6`,
   addressContainer: `flex flex-row gap-2 items-center justify-center`,
   address: `  mt-20 mb-2 text-center`,
   balance: `text-md text-[#8a939b] mb-4`,
   qrCodeContainer: `flex flex-col items-center`,
   qrCodeLabel: `text-md font-semibold mb-2`,
-  nftsSection: `w-full max-w-[90%]  rounded-lg p-4`,
+  nftsSection: `w-full  rounded-lg p-4`,
   nftGrid: `flex flex-wrap justify-center gap-1`, // Grid layout for NFTs
 
-  nftCard: `bg-[#212121] w-[200px] mb-3 rounded-md  overflow-hidden`,
-  nftImg: `w-[200px] h-48 ml-[3px] mt-[3px] rounded-t-md cursor-pointer    object-cover`, // Removed redundant w-full
+  nftCard: `bg-[#212121] w-[200px] mb-3 rounded-md  overflow-hidden relative`, // Added relative positioning
+  nftImg: `w-[200px] h-48 ml-[3px] mt-[3px] rounded-t-md cursor-pointer object-cover`, // Removed redundant w-full
   info: `flex justify-between text-white drop-shadow-xl ml-2 mr-2`,
   infoLeft: `flex-0.6 flex-wrap`,
   assetName: `font-bold mt-1`, // Responsive text sizes
+  buttonsContainer: `absolute bottom-5 left-0 right-0 flex flex-row gap-2 justify-center items-center p-2 opacity-0 hover:opacity-100 `, // Hidden by default
 };
-
 const Profile = () => {
   const [userNFTList, setuserNFTList] = useState(null);
   const [userAccount, setUserAccount] = useState(null);
@@ -54,7 +54,7 @@ const Profile = () => {
     queryKey: ["nftActor"],
   });
 
-  //  console.log("xcxcxcx :",userNFTS);
+  const { data: IcpActor } = useQuery({ queryKey: ["IcpActor"] });
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -144,37 +144,72 @@ const Profile = () => {
       {user?.principal ? (
         <div className={style.wrapper}>
           <div className={style.profileSection}>
-            <div className="flex flex-row items-center justify-between gap-4">
-              <div className="">
-                {shortenAddress(user?.principal?.toString(), 20)}
-              </div>
-              <AiOutlineCopy
-              className="cursor-pointer hover:text-lg"
-                onClick={() => handleCopyAddress(user?.principal?.toText())}
-              />
+            <div className="flex rounded-t-md text-black font-bold px-4 bg-white">
+              Overview
             </div>
-            <div className={style.addressContainer}>
-              <div className>
-                {user &&
-                  shortenAddress(
-                    AccountIdentifier.fromPrincipal({
-                      principal: user.principal,
-                    })?.toHex(),
-                    18
-                  )}
+
+            <div className="flex flex-col md:flex-row gap-2 w-full ">
+              <div className=" flex flex-col px-4 py-2 w-full">
+                <span className="font-bold">Wallet ID:</span>
+                {user?.principal && (
+                  <div className="flex flex-row gap-2  items-center">
+                    <span className="flex flex-row justify-center items-center">
+                      {shortenAddress(user?.principal?.toString(), 20)}
+                    </span>
+
+                    <AiOutlineCopy
+                      size={25}
+                      className="cursor-pointer border rounded-md p-1 hover:text-lg"
+                      onClick={() =>
+                        handleCopyAddress(user?.principal?.toText())
+                      }
+                    />
+                  </div>
+                )}
               </div>
-              <AiOutlineCopy
-                onClick={() =>
-                  handleCopyAddress(
-                    AccountIdentifier.fromPrincipal({
-                      principal: user.principal,
-                    })?.toHex()
-                  )
-                }
-                className="cursor-pointer text-lg hover:text-lg"
-              />
+
+              <div className=" flex flex-col px-4 py-2 w-full">
+                <span className="font-bold">Balance:</span>
+                <div className="flex flex-row gap-2  items-center">
+                    <span className="flex justify-center items-center">
+                      {userIcpBalance ? userIcpBalance : <ClipLoader size={15} color="white"  />} ICP
+                  </span>
+                </div>
+              </div>
             </div>
-            <TransferICP />
+
+            <div className=" flex flex-col px-4 py-2 w-full">
+              <span className="font-bold">Account Identifier:</span>
+
+              {user?.principal ? (
+                <div className="flex flex-row gap-2  items-center">
+                  <span>
+                    {shortenAddress(
+                      AccountIdentifier.fromPrincipal({
+                        principal: user.principal,
+                      })?.toHex(),
+                      18
+                    )}
+                  </span>
+
+                  <AiOutlineCopy
+                    size={25}
+                    className="cursor-pointer border rounded-md p-1 hover:text-lg"
+                    onClick={() =>
+                      handleCopyAddress(
+                        AccountIdentifier.fromPrincipal({
+                          principal: user.principal,
+                        })?.toHex()
+                      )
+                    }
+                  />
+                </div>
+              ) : (
+                <ClipLoader />
+              )}
+            </div>
+
+            {/* <TransferICP /> */}
 
             {/* <div>{userIcpBalance && userIcpBalance} ICP</div> */}
           </div>
@@ -186,7 +221,7 @@ const Profile = () => {
             <div className={style.nftGrid}>
               {userNFTList && userNFTList?.length > 0 ? (
                 userNFTList?.map((nft, index) => (
-                  <div className={style.nftCard}>
+                  <div className={`${style.nftCard} ${style.nftCardHover}`}>
                     <img
                       src={`https://${
                         nft.canister_id
@@ -217,29 +252,31 @@ const Profile = () => {
                         <div className={style.assetName}>#{nft.nftid} </div>
                       </div>
                     </div>
-                    {nft.type == "Owned" ? (
-                      <div className="flex flex-row mt-4 gap-2 justify-center items-center">
-                        <ListNFT nft={nft} handleTrigger={handleTrigger} />
-                        <TransferNFT nft={nft} handleTrigger={handleTrigger} />
-                      </div>
-                    ) : (
-                      <div className="flex flex-row p-1 gap-4 justify-center items-center">
-                        <UnlistUpdate
-                          nft={computeExtTokenIdentifier(
-                            nft.nftid,
-                            nft.canister_id
-                          )}
-                          handleTrigger={handleTrigger}
-                        />
-                        <UpdatePrice
-                          nft={computeExtTokenIdentifier(
-                            nft.nftid,
-                            nft.canister_id
-                          )}
-                          handleTrigger={handleTrigger}
-                        />
-                      </div>
-                    )}
+                    <div className={style.buttonsContainer}>
+                      {nft.type == "Owned" ? (
+                        <>
+                          <ListNFT nft={nft} handleTrigger={handleTrigger} />
+                          <TransferNFT nft={nft} handleTrigger={handleTrigger} />
+                        </>
+                      ) : (
+                        <>
+                          <UnlistUpdate
+                            nft={computeExtTokenIdentifier(
+                              nft.nftid,
+                              nft.canister_id
+                            )}
+                            handleTrigger={handleTrigger}
+                          />
+                          <UpdatePrice
+                            nft={computeExtTokenIdentifier(
+                              nft.nftid,
+                              nft.canister_id
+                            )}
+                            handleTrigger={handleTrigger}
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (

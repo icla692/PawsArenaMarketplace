@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Login from "../pages/Login";
 import pawsarena from "../assets/pawsarena.png";
 import { useIdentityKit } from "@nfid/identitykit/react";
+import { LuLogOut } from "react-icons/lu";
 
 const style = {
   wrapper: ` bg-[#121212] fixed z-50 w-full gap-[80px] px-[1.2rem] md:px-[4.2rem] py-[0.8rem] flex items-center justify-between top-0`,
@@ -18,11 +19,11 @@ const style = {
   headerItems: `hidden md:flex items-center justify-end`,
   headerItem: `text-white px-4 font-bold text-[#c8cacd] hover:text-white cursor-pointer`,
   headerIcon: `text-[#8a939b] text-3xl font-black px-4 hover:text-white cursor-pointer`,
-  mobileMenu: `absolute top-16  left-0 bg-[#08111d] z-50 md:hidden`,
-  mobileItem: `text-white px-4 py-2  cursor-pointer`,
-  mobileDropdownMenu: `absolute top-15 left-0 bg-[#04111d] md:hidden`,
-  dropdownMenu: `absolute right-0 z-50 bg-[#04111d] mt-36 rounded shadow-lg`, // Dropdown styles
-  dropdownItem: `text-white px-4 py-2  cursor-pointer`, // Dropdown item styles
+  mobileMenu: `absolute top-[60px] flex text-start px-2 justify-start items-start flex-col right-0 bg-[#08111d] border rounded-lg  z-50 md:hidden`,
+  mobileItem: `text-white text-start  py-1  cursor-pointer`,
+  mobileDropdownMenu: `absolute top-15 left-0 border rounded-lg bg-[#04111d] md:hidden`,
+  dropdownMenu: `absolute right-0 md:right-16 top-16 z-50 bg-red-400 rounded shadow-lg`, // Dropdown styles
+  dropdownItem: `text-white  cursor-pointer`, // Dropdown item styles
 };
 
 const Navbar = () => {
@@ -31,54 +32,46 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown menu
 
-  const {
-    agent,
-    user,
-    disconnect,
-  } = useIdentityKit();
-
-
-
-
+  const { agent, user, disconnect } = useIdentityKit();
 
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
   });
 
   const toggleMenu = () => {
+    console.log("dd");
+
     setIsMenuOpen(!isMenuOpen);
   };
 
   const toggleDropdown = () => {
-    console.log("cccccnn");
-    
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleLogout = async () => {
     // Implement logout functionality here
-    disconnect()
-     await queryClient.setQueryData(["userPrincipal"], null);
+    disconnect();
+    await queryClient.setQueryData(["userPrincipal"], null);
 
     // await queryClient.invalidateQueries(["userPrincipal"])
     setIsDropdownOpen(false); // Close dropdown after logout
-    navigate("/")
+    navigate("/");
   };
 
-
-  
-  useEffect(()=>{
-    
-     console.log("user :",agent);
-  },[agent])
+  useEffect(() => {
+    console.log("user :", agent);
+  }, [agent]);
 
   return (
     <div className={style.wrapper}>
       <div className={style.logoContainer}>
         <img
-                  onClick={() => navigate("/")}
-
-         src={pawsarena} height={70} width={70} alt="Logo" />
+          onClick={() => navigate("/")}
+          src={pawsarena}
+          height={70}
+          width={70}
+          alt="Logo"
+        />
         {/* <div
           onClick={() => navigate(userPrincipal ? "/dashboard" : "/")}
           className={style.logoText}
@@ -98,7 +91,7 @@ const Navbar = () => {
       <div className="md:hidden">
         <GiHamburgerMenu
           className="cursor-pointer"
-          onClick={()=>toggleMenu}
+          onClick={() => toggleMenu()}
           color="white"
         />
       </div>
@@ -113,27 +106,41 @@ const Navbar = () => {
         <div className={style.headerItem}> Home </div>
         {/* <div className={style.headerItem}> Resources </div> */}
         <div className={style.headerItem}> About </div>
-        <div className={style.headerIcon} onClick={toggleDropdown}>
-          {user?.principal ? <CgProfile /> : <Login />}
+        <div className={style.headerItem} onClick={toggleDropdown}>
+          {user?.principal ? (
+            <div className="flex flex-row justify-center border px-4 py-1 rounded-md items-center gap-8">
+              <CgProfile
+                size={25}
+                onClick={() => {
+                  navigate("/profile");
+                }}
+              />
+              <LuLogOut onClick={handleLogout} size={23} />
+
+            </div>
+          ) : (
+            <Login />
+          )}
         </div>
 
         {/* Dropdown Menu */}
-        {isDropdownOpen && user?.principal && (
+        {/* {isDropdownOpen && user && (
           <div className={style.dropdownMenu}>
             <div
               className={style.dropdownItem}
               onClick={() => {
                 navigate("/profile");
-                toggleDropdown();
+                // toggleDropdown();
               }}
             >
               Profile
             </div>
+
             <div className={style.dropdownItem} onClick={handleLogout}>
-              Logout
+              <LuLogOut size={25} />
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Mobile Menu */}
@@ -141,39 +148,53 @@ const Navbar = () => {
         <div className={style.mobileMenu}>
           <div
             className={style.mobileItem}
-            onClick={() =>  {navigate("/dashboard");toggleMenu()}}
+            onClick={() => {
+              navigate("/");
+              toggleMenu();
+            }}
           >
-            Marketplace
+            Home
           </div>
-          {/* <div
+          <div
             className={style.mobileItem}
-            onClick={() =>  {navigate("/dashboard");toggleMenu()}}
+            onClick={() => {
+              navigate("/");
+              toggleMenu();
+            }}
           >
-            Stats
-          </div> */}
-          {/* <div
-            className={style.mobileItem}
-            onClick={() =>  {navigate("/dashboard");toggleMenu()}}
-          >
-            Resources
-          </div> */}
-          {/* <div
-            className={style.mobileItem}
-            onClick={() =>  {navigate("/dashboard");toggleMenu()}}
-          >
-            Create
-          </div> */}
+            About
+          </div>
+
           <div className={style.mobileItem} onClick={toggleDropdown}>
-            {user ? <CgProfile /> : <Login />}
+            {user?.principal ? (
+              <>
+                <div
+                  className={style.dropdownItem}
+                  onClick={() => {
+                    navigate("/profile");
+                    toggleDropdown();
+                    toggleMenu();
+                  }}
+                >
+                  Profile
+                </div>
+                <div className={style.dropdownItem} onClick={handleLogout}>
+                  <LuLogOut size={25} />
+                </div>
+              </>
+            ) : (
+              <Login />
+            )}
           </div>
-          {isDropdownOpen && user && (
+
+          {/* {isDropdownOpen && user && (
             <div className={style.mobileDropdownMenu}>
               <div
                 className={style.dropdownItem}
                 onClick={() => {
                   navigate("/profile");
                   toggleDropdown();
-                  toggleMenu()
+                  toggleMenu();
                 }}
               >
                 Profile
@@ -182,7 +203,7 @@ const Navbar = () => {
                 Logout
               </div>
             </div>
-          )}
+          )} */}
         </div>
       )}
     </div>

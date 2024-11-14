@@ -17,32 +17,6 @@ const Footer = () => {
               © {new Date().getFullYear()} All rights reserved.
             </p>
           </div>
-          {/* <ul className="flex space-x-1 flex-col md:flex-row  md:space-x-4">
-            <li className="flex items-center">
-              <FaHome className="mr-1" />
-              <a href="#" className="hover:text-gray-400">
-                Website
-              </a>
-            </li>
-            <li className="flex items-center">
-              <FaInfoCircle className="mr-1" />
-              <a href="#" className="hover:text-gray-400">
-                Youtube
-              </a>
-            </li>
-            <li className="flex items-center">
-              <FaServicestack className="mr-1" />
-              <a href="#" className="hover:text-gray-400">
-                Twitter
-              </a>
-            </li>
-            <li className="flex items-center">
-              <FaEnvelope className="mr-1" />
-              <a href="#" className="hover:text-gray-400">
-                Discord
-              </a>
-            </li>
-          </ul> */}
         </div>
       </div>
     </footer>

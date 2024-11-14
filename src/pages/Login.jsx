@@ -27,8 +27,6 @@ const Login = () => {
     connect,
   } = useIdentityKit();
 
-  //  console.log("wewewewe :",icpBalance,accounts,user);
-
   const [isLoading, setIsLoading] = useState(false);
 
   // const handleLogin = async () => {
@@ -167,16 +165,8 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="flex text-black font-semibold justify-center items-center gap-1 text-lg border border-red-300 bg-yellow-200 p-2 rounded-md cursor-pointer">
+      <div className="flex text-black font-semibold justify-center items-center gap-1 text-lg border border-red-300 bg-yellow-200 p-1 rounded-md cursor-pointer">
         <BiWallet />
-        {/* {user ? (
-          <div>
-
-          {user?.principal?.toString()}
-          </div>
-        ) : ( */}
-
-        {/* <ConnectWallet /> */}
         <button onClick={() => connect()}>Login</button>
       </div>
     </div>
