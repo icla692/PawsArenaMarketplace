@@ -20,6 +20,7 @@ import { idlFactory as ICPDL } from "../Utils/icptoken.did";
 import { useNavigate } from "react-router-dom";
 import { HttpAgent } from "@dfinity/agent";
 import { BarLoader } from "react-spinners";
+import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 const Home = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -37,6 +38,8 @@ const Home = () => {
   const { data: collectionDetails, isLoading: collectionLoading } = useQuery({
     queryKey: ["collectionDetails"],
   });
+
+  const [treiggerRefetch, setTriggerRefetch] = useState("");
 
   const fetchDetails = async () => {
     try {
@@ -95,20 +98,21 @@ const Home = () => {
   useEffect(() => {
     //
     fetchDetails();
-  }, [user, agent]);
+  }, [user]);
 
   const replacer = (key, value) =>
     typeof value === "bigint" ? value.toString() : value;
 
   useEffect(() => {
-    const loadBulkData = async () => {
-      let data = [];
-
-      if (bulkData) {
-        console.log("sss here present");
-
+    const loadData = async () => {
+      let bulkDataArray = [];
+      let collectionDetailsArray = [];
+      
+      if (bulkData && collectionDetails) {
+        console.log("Data already present");
         return;
       }
+
       setIsLoading(true);
 
       try {
@@ -124,8 +128,7 @@ const Home = () => {
                 nftActor.getTokens(),
               ]);
 
-
-            data.push([
+            bulkDataArray.push([
               collection.canisterId,
               {
                 imgUrl: collection.imageUrl,
@@ -140,36 +143,8 @@ const Home = () => {
                 allNftTokens,
               },
             ]);
-          } catch (error) {
-            console.error("Error loading NFT data:", error);
-          }
-        }
 
-        console.log("fetching bulk data", data);
-
-        queryClient.setQueryData(["bulkData"], data);
-      } catch (error) {
-        console.log("error in geting bulk data :", error);
-      }
-
-      setIsLoading(false);
-    };
-    loadBulkData();
-  }, []);
-
-  useEffect(() => {
-    const loadCollectionDetails = async () => {
-      let data = [];
-
-      let exD = localStorage.getItem("collectionDetails");
-      if (collectionDetails) return;
-      // setIsLoading(true)
-      try {
-        for (const collection of NFTCollections) {
-          let nftActor = createActor(collection.canisterId, PawsIDL, agent);
-          let nftStats = await nftActor.stats();
-          try {
-            data.push({
+            collectionDetailsArray.push({
               imgUrl: collection.imageUrl,
               canisterId: collection.canisterId,
               name: collection.name,
@@ -178,20 +153,81 @@ const Home = () => {
               floorprice: nftStats[3],
               totalListed: nftStats[4],
             });
+
           } catch (error) {
             console.error("Error loading NFT data:", error);
           }
         }
-
-        console.log("fetching collection details data", data);
-        queryClient.setQueryData(["collectionDetails"], data);
+        console.log("fetching bulk data", bulkDataArray);
+        console.log("fetching collection details data", collectionDetailsArray);
+        queryClient.setQueryData(["bulkData"], bulkDataArray);
+        queryClient.setQueryData(["collectionDetails"], collectionDetailsArray);
       } catch (error) {
-        console.log("error in geting collection details :", error);
+        console.log("error in getting data:", error);
       }
+      setIsLoading(false);
     };
 
-    loadCollectionDetails();
-  }, [user]);
+    loadData();
+  }, [treiggerRefetch]);
+
+  useEffect(() => {
+   
+
+    const fetchData = async()=>{
+
+      let combinedTokens = [];
+      let collectionData = []
+
+
+
+
+      
+      if (!bulkData || !collectionDetails) {
+        //trigger the refetching of the tokens
+        setTriggerRefetch(Math.random().toString(36).substring(7));
+        return
+      }
+  
+        const marketActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
+        const marketNFTsResponse = await marketActor?.get_all_listed_nfts();
+  
+
+      for(const collection of NFTCollections){
+        // const filteredCollection = NFTCollections.find(col => col.canisterId === collection.canisterId);
+        const filteredMarketNFTs = marketNFTsResponse?.data[0]?.filter(nft => nft[1].nft_canister == collection.canisterId) || [];
+
+        const nftIds = filteredMarketNFTs?.map(nft => [
+          nft[1].nft_id,
+          {
+              locked: [],
+              seller: nft[1].seller_principal,
+              price: nft[1].nft_price,
+              inhouse_sale: true,
+          },
+      ]);
+
+      let tokenListings = bulkData?.find((det)=>det[0] == collection.canisterId)
+      const combinedListings = [...nftIds];
+      const lookup = Object.fromEntries(combinedListings.map(item => [item[0], item]));
+      const updatedTokens = tokenListings[1]?.allNftTokens?.map(item => lookup[item[0]] ? lookup[item[0]] : item);
+      queryClient.setQueryData(["myTokens"], updatedTokens);
+      queryClient.setQueryData(["listedNfts"], updatedTokens);
+  
+      }
+
+    }
+    
+
+    fetchData()
+
+
+
+
+
+
+
+  }, [bulkData, collectionDetails]);
 
   return (
     <div

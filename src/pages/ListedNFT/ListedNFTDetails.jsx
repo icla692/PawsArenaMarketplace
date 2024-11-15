@@ -25,6 +25,7 @@ import UnlistUpdate from "../Unlist";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./UpdatePrice";
 import { idlFactory as PawsIDL } from "../../Utils/paws.did";
+import ICPLogo from "../../assets/icplogo.png";
 const style = {
   wrapper: `flex gap-3 mt-[80px] flex-col md:flex-row justify-center bg-[#121212] h-screen p-4 text-white`,
   leftwrapper: `flex flex-col  items-center md:items-start  mb-4 md:mb-0`,
@@ -90,6 +91,7 @@ const ListedNFTDetails = () => {
     const fetchDetails = async () => {
       try {
         if (!colID || !nftID) return;
+console.log("ddd");
 
         setButtonLoading(true);
 
@@ -109,7 +111,10 @@ const ListedNFTDetails = () => {
         let fil = tokenListings[1]?.transactions?.filter(
           (tran) => tran?.token == tokenIdentifier
         );
+
+        console.log("ccc :",myTokens );
         if (markTrans.data.length > 0) {
+          
           setSaleHistory([...fil, ...markTrans?.data[0]]);
         } else {
           setSaleHistory([...fil]);
@@ -159,7 +164,7 @@ const ListedNFTDetails = () => {
     e.preventDefault();
     if (!nftDetails) return;
     setButtonLoading(true);
- 
+
     try {
       let res = await marketplaceActor.un_list_nft(nftDetails.token_identifier);
       console.log("unlisting res :", res);
@@ -219,7 +224,6 @@ const ListedNFTDetails = () => {
               className={style.nftImg}
             />
           </div>
-      
 
           <div className="flex flex-col w-full items-start">
             <h1>Traits</h1>
@@ -241,10 +245,15 @@ const ListedNFTDetails = () => {
             <div className="flex flex-col  xs:px-3 md:px-0 gap-4 w-full">
               <div className="flex  flex-col w-full gap-1  bg-[#1B1B1B] border border-gray-400 p-2 rounded-lg">
                 <h3>Current Price</h3>
-                <span className="text-[25px]">
-                  {nftDetails &&
-                    (Number(nftDetails?.nft_price) / 1e8).toFixed(2)} {" "}ICP
-                </span>
+                <div className="flex flex-row gap-1">
+                  <img src={ICPLogo} height="7px" width="15px" />
+
+                  <span className="flex text-lg">
+                    {nftDetails &&
+                      (Number(nftDetails?.nft_price) / 1e8).toFixed(2)}
+                  </span>
+                </div>
+
                 {user &&
                 user.principal.toString() ==
                   nftDetails?.seller_principal?.toString() ? (

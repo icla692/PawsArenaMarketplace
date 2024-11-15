@@ -96,7 +96,7 @@ const UpdatePrice = ({ nft, handleTrigger }) => {
       </button>
 
       {updateModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-[#252525] rounded-lg shadow-lg p-6 w-96">
             <div className="flex justify-between ">
               <h2 className=" mb-4">Update NFT price</h2>

@@ -123,7 +123,7 @@ const authenticatedAgent = useAgent()
     <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
       <button 
 
-className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+className="flex bg-gray-300 w-full border mt-4 font-bold text-black justify-center items-center p-2"
       
       onClick={() => setIsModalOpen(true)}>List</button>
 

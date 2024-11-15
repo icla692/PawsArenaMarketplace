@@ -25,8 +25,8 @@ const CollectionDetails = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 50;
-    const [listedNfts, setListedNfts] = useState([]);
-    const [allTokens, setAllTokens] = useState([]);
+    // const [listedNfts, setListedNfts] = useState([]);
+    // const [allTokens, setAllTokens] = useState([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
@@ -35,6 +35,19 @@ const CollectionDetails = () => {
     const { data:bulkData  } = useQuery({
         queryKey: ["bulkData"],
       });
+
+
+
+      const { data:allTokens  } = useQuery({
+        queryKey: ["allTokens"],
+      });
+
+
+      const { data:listedNfts  } = useQuery({
+        queryKey: ["listedNfts"],
+      });
+
+
 
    
     const { data: myTokens, isLoading: dataLoading } = useQuery({ queryKey: ["myTokens"] });
@@ -46,29 +59,25 @@ const CollectionDetails = () => {
         queryKey: ["collectionDetails"],
       });
     
+
       
+
 
    
     useEffect(() => {
         const fetchNFTDetails = async () => {
             // if (!collectionID) return;
             setIsLoading(true);
-
-            let data = JSON.parse(localStorage.getItem("bulkData"))
-            let data2 = JSON.parse(localStorage.getItem("bulkData"))
-
-            console.log("here is the data :",data2);
-            
-
-            console.log("xxxxxxxx :",collectionDetails,bulkData);
             
             try {
 
                 const marketActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
                 const filteredCollection = NFTCollections.find(col => col.canisterId === collectionID);
+               
                 const marketNFTsResponse = await marketActor?.get_all_listed_nfts();
                 const filteredMarketNFTs = marketNFTsResponse?.data[0]?.filter(nft => nft[1].nft_canister == collectionID) || [];
                 
+
                 
                 // Prepare NFT IDs
                 const nftIds = filteredMarketNFTs?.map(nft => [
@@ -81,8 +90,8 @@ const CollectionDetails = () => {
                     },
                 ]);
                 
-                let tokenListings = bulkData?.find((det)=>det[0] == collectionID)
-               let colDetails = collectionDetails?.find((det)=>det.canisterId == collectionID)
+            let tokenListings = bulkData?.find((det)=>det[0] == collectionID)
+            let colDetails = collectionDetails?.find((det)=>det.canisterId == collectionID)
                
                
                
@@ -90,18 +99,19 @@ const CollectionDetails = () => {
                  const combinedListings = [...nftIds];
 
                 //const combinedListings = [...tokenListings[1]?.listings, ...nftIds];
-                setListedNfts(combinedListings);
+                // setListedNfts(combinedListings);
                 // Fetch additional stats and tokens
                 // const nftStats = await nftActor.stats();
                 // const allTokensResponse = await nftActor.getTokens();
 
                 // Create a lookup for easy access to listed NFTs
+               
                 const lookup = Object.fromEntries(combinedListings.map(item => [item[0], item]));
                 const updatedTokens = tokenListings[1]?.allNftTokens?.map(item => lookup[item[0]] ? lookup[item[0]] : item);
 
                 console.log("all ttt :",updatedTokens);
                 
-                setAllTokens(updatedTokens);
+                // setAllTokens(updatedTokens);
                  queryClient.setQueryData(["myTokens"], updatedTokens);
 
                 // Prepare collection data for display
@@ -215,6 +225,9 @@ const CollectionDetails = () => {
     }, [listedNfts, allTokens, searchQuery, sortPrice, listedFilter, minPrice, maxPrice, currentPage]);
     // Calculate total pages based on all tokens
     const totalPages = Math.ceil(allTokens?.length / itemsPerPage);
+
+
+
 
     return (
         <>

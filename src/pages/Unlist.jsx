@@ -75,7 +75,7 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
         </button>
       </div>
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
           {showModal && (
             <div
               className={`absolute top-10 text-xs z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
