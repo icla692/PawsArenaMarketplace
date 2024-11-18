@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { computeExtTokenIdentifier } from "../../Utils/tid";
 import { CgClose } from "react-icons/cg";
@@ -14,7 +14,7 @@ import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { createActor } from "../../Utils/createActor";
 import { IoEyeSharp } from "react-icons/io5";
 import MakeOffer from "./MakeOffer";
-import BuyNow from "./BuyNFT";
+// import BuyNow from "./BuyNFT";
 import useFecth from "../../Utils/useFecth";
 import SaleHistory from "./SaleHistory";
 import Offers from "./Offers";
@@ -26,6 +26,11 @@ import { useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./UpdatePrice";
 import { idlFactory as PawsIDL } from "../../Utils/paws.did";
 import ICPLogo from "../../assets/icplogo.png";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import BuyNow from "../BuyNow";
+
+
 const style = {
   wrapper: `flex gap-3 mt-[80px] flex-col md:flex-row justify-center bg-[#121212] h-screen p-4 text-white`,
   leftwrapper: `flex flex-col  items-center md:items-start  mb-4 md:mb-0`,
@@ -40,6 +45,8 @@ const ListedNFTDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [listbuttonLoading, setListButtonLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+
   const [listTrigger, setTrigger] = useState("");
   const navigate = useNavigate();
 
@@ -87,23 +94,37 @@ const ListedNFTDetails = () => {
 
   const handleTrigger = (e) => setTrigger(Math.random());
 
+
+  const tokenIdentifier = useMemo(() => {
+    if (!colID || !nftID) return null;
+    return computeExtTokenIdentifier(nftID, colID);
+  }, [colID, nftID]);
+
+  const nftInfo = useMemo(() => {
+    return myTokens?.find((nft) => nft[0] == nftID);
+  }, [myTokens, nftID]);
+
+
+
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         if (!colID || !nftID) return;
-console.log("ddd");
+        console.log("ddd");
 
-        setButtonLoading(true);
+        setContentLoading(true);
 
-        let tokenIdentifier = computeExtTokenIdentifier(nftID, colID);
+        // let tokenIdentifier = computeExtTokenIdentifier(nftID, colID);
         // let nftInfo = myTokens?.filter((nft) => nft[0] == nftID);
 
         let nftActor = createActor(PAWS_ARENA_CANISTER, PawsIDL, agent);
 
+
         // let res = await nftActor?.getMergedSVG(Number(nftID));
         // console.log("res for the vector svg :", res);
 
-        const nftInfo = myTokens?.find((nft) => nft[0] == nftID);
+        // const nftInfo = myTokens?.find((nft) => nft[0] == nftID);
         let markTrans = await marketActor?.get_nft_sale_history(
           tokenIdentifier
         );
@@ -112,18 +133,31 @@ console.log("ddd");
           (tran) => tran?.token == tokenIdentifier
         );
 
-        console.log("ccc :",myTokens );
+        console.log("ccc :", myTokens);
         if (markTrans.data.length > 0) {
-          
           setSaleHistory([...fil, ...markTrans?.data[0]]);
         } else {
           setSaleHistory([...fil]);
         }
 
-        //get the nft data from the already set data
         if (nftInfo?.length > 0) {
-          //check if the nft is an inhouse sale or an external sale
-          if (nftInfo[1].inhouse_sale) {
+
+
+          //if the nft is not listed
+          if(nftInfo[1].hasOwnProperty('metadata')){
+
+            //get the owner of the nft
+
+            let _owner = await nftActor.ext_bearer(tokenIdentifier)
+            
+
+
+
+
+          }
+
+          //if the nft is listed on our marketplace
+          else if (nftInfo[1].inhouse_sale) {
             //fetch all the details from the marketplace canister
             let details = await marketActor?.get_listed_nft_details(
               tokenIdentifier
@@ -132,7 +166,8 @@ console.log("ddd");
             if (details.status === 200 && details.status_text === "Ok") {
               setNFTDetails(details.data[0]);
             }
-          } else {
+          }
+          else {
             //fetch the details from the nft canister itself
             setNFTDetails({
               seller_principal: nftInfo[1].seller?.toString(),
@@ -145,17 +180,29 @@ console.log("ddd");
         console.log("error in fetching details :", error);
       }
 
-      setButtonLoading(false);
+      setContentLoading(false);
     };
 
     fetchDetails();
   }, [colID, nftID, listTrigger]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   const { mutateAsync: HandleUnlist } = useMutation({
     mutationFn: (e) => handleUnlist(e),
     onSuccess: async () => {
       invalidateListings();
-      setButtonLoading(false);
       navigate("../profile");
     },
   });
@@ -237,10 +284,14 @@ console.log("ddd");
               {nftDetails && "ICKitties"} # {nftID}
             </h1>
             <span>Owned by {nftDetails?.seller_principal?.toString()}</span>
-            <div className="flex gap-1  text-sm">
+            {/* <div className="flex gap-1  text-sm">
               <span>{<IoEyeSharp size={25} color="gray" />}</span>
               <span>20 views</span>
-            </div>
+            </div> */}
+
+            {
+              nftDetails?.nft_price && 
+
 
             <div className="flex flex-col  xs:px-3 md:px-0 gap-4 w-full">
               <div className="flex  flex-col w-full gap-1  bg-[#1B1B1B] border border-gray-400 p-2 rounded-lg">
@@ -254,9 +305,15 @@ console.log("ddd");
                   </span>
                 </div>
 
-                {user &&
-                user.principal.toString() ==
-                  nftDetails?.seller_principal?.toString() ? (
+                {contentLoading ? (
+                  <div className="flex w-full justify-center items-center">
+
+                    <ClipLoader size={20} color="white"/>
+
+                  </div>
+                ) : user &&
+                  user.principal.toString() ==
+                    nftDetails?.seller_principal?.toString() ? (
                   <div className="flex flex-row gap-4 justify-center items-center w-full">
                     <UnlistUpdate nft={nftDetails?.token_identifier} />
                     <UpdatePrice
@@ -270,6 +327,7 @@ console.log("ddd");
                       nft_price={Number(nftDetails?.nft_price)}
                       nftid={nftDetails?.token_identifier}
                     />
+
                     <MakeOffer
                       nft_price={Number(nftDetails?.nft_price)}
                       nftid={nftDetails?.token_identifier}
@@ -287,6 +345,12 @@ console.log("ddd");
                 handleTrigger={handleTrigger}
               />
             </div>
+
+          }
+
+
+
+
           </div>
         </div>
       </div>

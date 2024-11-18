@@ -14,7 +14,7 @@ const ListNFT = ({ nft,handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrice, setNewPrice] = useState(0);
   const [buttonLoading, setButtonLoading] = useState(false);
-
+const queryClient = useQueryClient()
 
 const {invalidateListings} = useFecth()
 const authenticatedAgent = useAgent()
@@ -116,7 +116,10 @@ const authenticatedAgent = useAgent()
     } catch (error) {
       console.log("Error in listing NFT:", error);
     }
-    handleTrigger()
+
+    queryClient.setQueryData(["refreshData"], Math.random());
+
+    // handleTrigger()
   };
 
   return (

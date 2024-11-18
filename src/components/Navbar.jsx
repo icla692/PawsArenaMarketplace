@@ -103,7 +103,7 @@ const Navbar = () => {
           
           Marketplace
         </div> */}
-        <div className={style.headerItem}> Home </div>
+        <div className={style.headerItem} onClick={()=>navigate("/")}> Home </div>
         {/* <div className={style.headerItem}> Resources </div> */}
         <div className={style.headerItem}> About </div>
         <div className={style.headerItem} onClick={toggleDropdown}>
@@ -178,7 +178,7 @@ const Navbar = () => {
                 >
                   Profile
                 </div>
-                <div className={style.dropdownItem} onClick={handleLogout}>
+                <div className="cursor-pointer mt-3" onClick={handleLogout}>
                   <LuLogOut size={25} />
                 </div>
               </>

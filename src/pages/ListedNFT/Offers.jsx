@@ -1,5 +1,5 @@
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
@@ -11,7 +11,7 @@ const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
   const authenticatedAgent = useAgent();
   const { user } = useIdentityKit();
  const navigate = useNavigate()
-
+const queryClient = useQueryClient()
 
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -53,6 +53,9 @@ const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
       } else {
         displayNotificationModal(res.error_text, "error");
       }
+
+      queryClient.setQueryData(["refreshData"], Math.random());
+
       
     } catch (error) {
       console.log("error in accepting offer :", error);

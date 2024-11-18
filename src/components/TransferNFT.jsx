@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import useFecth from "../Utils/useFecth";
 import { ClipLoader } from "react-spinners";
@@ -18,6 +18,8 @@ const TransferNFT = ({ nft, handleTrigger }) => {
   const { invalidateListings } = useFecth();
   const authenticatedAgent = useAgent();
   const { user } = useIdentityKit();
+
+  const queryClient = useQueryClient();
   //modals for the notification popup
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -58,37 +60,42 @@ const TransferNFT = ({ nft, handleTrigger }) => {
       nft.canister_id
     );
 
-    //should create an ft canister instance but for now use the ic kitties
+    try {
+      let transferResults = await nftActor.transfer({
+        amount: parseInt(1),
+        from: { principal: user.principal },
+        memo: [],
+        notify: false,
+        subaccount: [],
+        to: { address: recipient },
+        token: tokenIdentifier,
+      });
 
-    let transferResults = await nftActor.transfer({
-      amount: parseInt(1),
-      from: { principal: user.principal },
-      memo: [],
-      notify: false,
-      subaccount: [],
-      to: { address: recipient },
-      token: tokenIdentifier,
-    });
+      if (transferResults.ok) {
+        displayNotificationModal("NFT transfer successful", "success");
+      } else {
+        displayNotificationModal(transferResults.err, "error");
+      }
 
-    if (transferResults.ok) {
-      displayNotificationModal("NFT transfer successful", "success");
-    } else {
-      displayNotificationModal(transferResults.err, "error");
+      console.log("transfer success", transferResults);
+    } catch (error) {
+      console.log("error in transfering nft :", error);
     }
 
-    handleTrigger();
+    queryClient.setQueryData(["refreshData"], Math.random());
 
-    console.log("transfer success", transferResults);
+    setButtonLoading(false);
+    // handleTrigger();
   };
 
   return (
     <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
-      <button 
-
-className="flex border bg-slate-300 w-full mt-4 font-bold text-black justify-center items-center p-2"
-
-      
-      onClick={() => setIsModalOpen(true)}>Transfer</button>
+      <button
+        className="flex border bg-slate-300 w-full mt-4 font-bold text-black justify-center items-center p-2"
+        onClick={() => setIsModalOpen(true)}
+      >
+        Transfer
+      </button>
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -114,7 +121,7 @@ className="flex border bg-slate-300 w-full mt-4 font-bold text-black justify-cen
               />
             </div>
 
-            <form onSubmit={HandleTransfer}>
+            <form onSubmit={handleTransfer}>
               <input
                 type="text"
                 id="recipient"

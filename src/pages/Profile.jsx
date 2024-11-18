@@ -39,17 +39,18 @@ const style = {
 const Profile = () => {
   const [userNFTList, setuserNFTList] = useState(null);
 
-  const [collectedNFTS,setCollectedNFTS] = useState([])
-  const [listedNFTS,setListedNFTS] = useState([])
-
-
-
+  const [collectedNFTS, setCollectedNFTS] = useState([]);
+  const [listedNFTS, setListedNFTS] = useState([]);
 
   const [userAccount, setUserAccount] = useState(null);
   const [trigger, setTrigger] = useState("");
   const { user } = useIdentityKit();
   const { data: userPrincipal } = useQuery({
     queryKey: ["userPrincipal"],
+  });
+
+  const { data: refreshData } = useQuery({
+    queryKey: ["refreshData"],
   });
 
   const { data: userIcpBalance } = useQuery({
@@ -64,7 +65,7 @@ const Profile = () => {
     queryKey: ["nftActor"],
   });
 
-  const { data:bulkData  } = useQuery({
+  const { data: bulkData } = useQuery({
     queryKey: ["bulkData"],
   });
 
@@ -72,7 +73,6 @@ const Profile = () => {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
 
   useEffect(() => {
     if (!userPrincipal) return;
@@ -88,7 +88,7 @@ const Profile = () => {
     const fetchUserListedNFTS = async () => {
       try {
         let collected = [];
-        let listed = []
+        let listed = [];
         if (!userPrincipal || !marketplaceActor) return;
         let res = await marketplaceActor?.get_all_user_listed_nfts(
           Principal.fromText(userPrincipal)
@@ -133,15 +133,15 @@ const Profile = () => {
             });
           }
         }
-        setCollectedNFTS(collected)
-        setListedNFTS(listed)
+        setCollectedNFTS(collected);
+        setListedNFTS(listed);
       } catch (error) {
         console.log("error in fetching user listed NFTs", error);
       }
     };
 
     fetchUserListedNFTS();
-  }, [user, trigger]);
+  }, [user, trigger, refreshData]);
 
   const handleTrigger = (e) => setTrigger(Math.random());
 
@@ -154,234 +154,135 @@ const Profile = () => {
     return `${address.slice(0, nom)}...${address.slice(-7)}`;
   };
 
-
   ///sort the displayed NFTs
 
-
-  const [selectedTab, setSelectedTab] = useState("Collected");
-  const [selectedCollection, setSelectedCollection] = useState("rw7qm-eiaaa-aaaak-aaiqq-cai");
+  const [selectedTab, setSelectedTab] = useState("Activity");
+  const [selectedCollection, setSelectedCollection] = useState(
+    "rw7qm-eiaaa-aaaak-aaiqq-cai"
+  );
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
   };
 
-
   const sortDisplayNFTs = useMemo(() => {
+    console.log("here is the data :", selectedTab);
 
-console.log("here is the data :",selectedTab);
+    if (selectedTab === "Activity") {
+      //filter the bulk data to get the transaction for the user account
 
-if(selectedTab === "Activity"){
-  //filter the bulk data to get the transaction for the user account
+      let tokenListings = bulkData?.find((det) => det[0] == selectedCollection);
 
-  let tokenListings = bulkData?.find((det)=>det[0] == selectedCollection)
+      console.log("token listings :", tokenListings);
 
-  console.log("token listings :",tokenListings);
-  
-  let filteredTransactions = tokenListings[1]?.transactions?.filter((trans)=>trans?.buyer == "e0df39bd9e458e4954e72ce7b0f35dc4c37bb0411950bb509090620ee9d6f558" || trans?.seller == user?.principal
-)
+      let filteredTransactions = tokenListings[1]?.transactions?.filter(
+        (trans) =>
+          trans?.buyer ==
+            "8edb53debf13d254295dbcbf1a888b0723a7f853a181e91e9518ec871fb934a6" ||
+          trans?.seller === user?.principal
+      );
 
-console.log("transactions :",filteredTransactions);
+      console.log("transactions :", filteredTransactions);
 
-return   <ActivityTable transactions = {filteredTransactions} selectedCollection={selectedCollection} />
+      return (
+        <ActivityTable
+          transactions={filteredTransactions}
+          selectedCollection={selectedCollection}
+        />
+      );
+    }
 
-}
-
-if(selectedTab === "Collected"){
-
-  let myNfts = collectedNFTS?.map((nft, index) => (
-    <div className={`${style.nftCard} ${style.nftCardHover}`}>
-    <img
-      src={`https://${
-        nft.canister_id
-      }.raw.icp0.io/?tokenid=${computeExtTokenIdentifier(
-        nft.nftid,
-        nft.canister_id
-      )}&type=thumbnail`}
-      alt=""
-      onClick={() =>
-        navigate(
-          nft.type === "Listed" &&
-            "../marketplace/" +
-              nft.canister_id +
-              "/" +
-              nft.nftid
-          // : "../nft/" + nft.canister_id + "/" + nft.nftid
-        )
-      }
-      className={style.nftImg}
-    />
-    <div className={style.info}>
-      <div className={style.infoLeft}>
-        <div className={style.collectionName}>
-          {nft.collectionName}
+    if (selectedTab === "Collected") {
+      let myNfts = collectedNFTS?.map((nft, index) => (
+        <div className={`${style.nftCard} ${style.nftCardHover}`}>
+          <img
+            src={`https://${
+              nft.canister_id
+            }.raw.icp0.io/?tokenid=${computeExtTokenIdentifier(
+              nft.nftid,
+              nft.canister_id
+            )}&type=thumbnail`}
+            alt=""
+            onClick={() =>
+              navigate(
+                nft.type === "Listed" &&
+                  "../marketplace/" + nft.canister_id + "/" + nft.nftid
+                // : "../nft/" + nft.canister_id + "/" + nft.nftid
+              )
+            }
+            className={style.nftImg}
+          />
+          <div className={style.info}>
+            <div className={style.infoLeft}>
+              <div className={style.collectionName}>{nft.collectionName}</div>
+            </div>
+            <div className={style.infoRight}>
+              <div className={style.assetName}>#{nft.nftid} </div>
+            </div>
+          </div>
+          <div className={style.buttonsContainer}>
+            {nft.type == "Owned" && (
+              <>
+                <ListNFT nft={nft} handleTrigger={handleTrigger} />
+                <TransferNFT nft={nft} handleTrigger={handleTrigger} />
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div className={style.infoRight}>
-        <div className={style.assetName}>#{nft.nftid} </div>
-      </div>
-    </div>
-    <div className={style.buttonsContainer}>
-      {nft.type == "Owned"&&(
-        <>
-          <ListNFT nft={nft} handleTrigger={handleTrigger} />
-          <TransferNFT nft={nft} handleTrigger={handleTrigger} />
-        </>
-      )
-      }
-    </div>
-  </div>
+      ));
+      return myNfts;
+    }
 
-  ))
+    if (selectedTab === "Selling") {
+      console.log(listedNFTS);
 
-  return myNfts
-
-}
-
-if(selectedTab === "Selling"){
-console.log(listedNFTS);
-
-  let myNfts = listedNFTS?.map((nft, index) => (
-    <div className={`${style.nftCard} ${style.nftCardHover}`}>
-    <img
-      src={`https://${
-        nft.canister_id
-      }.raw.icp0.io/?tokenid=${computeExtTokenIdentifier(
-        nft.nftid,
-        nft.canister_id
-      )}&type=thumbnail`}
-      alt=""
-      onClick={() =>
-        navigate(
-          nft.type === "Listed" &&
-            "../marketplace/" +
-              nft.canister_id +
-              "/" +
-              nft.nftid
-          // : "../nft/" + nft.canister_id + "/" + nft.nftid
-        )
-      }
-      className={style.nftImg}
-    />
-    <div className={style.info}>
-      <div className={style.infoLeft}>
-        <div className={style.collectionName}>
-          {nft.collectionName}
+      let myNfts = listedNFTS?.map((nft, index) => (
+        <div key={index} className={`${style.nftCard} ${style.nftCardHover}`}>
+          <img
+            src={`https://${
+              nft.canister_id
+            }.raw.icp0.io/?tokenid=${computeExtTokenIdentifier(
+              nft.nftid,
+              nft.canister_id
+            )}&type=thumbnail`}
+            alt=""
+            onClick={() =>
+              navigate(
+                nft.type === "Listed" &&
+                  "../marketplace/" + nft.canister_id + "/" + nft.nftid
+                // : "../nft/" + nft.canister_id + "/" + nft.nftid
+              )
+            }
+            className={style.nftImg}
+          />
+          <div className={style.info}>
+            <div className={style.infoLeft}>
+              <div className={style.collectionName}>{nft.collectionName}</div>
+            </div>
+            <div className={style.infoRight}>
+              <div className={style.assetName}>#{nft.nftid} </div>
+            </div>
+          </div>
+          <div className={style.buttonsContainer}>
+            {nft.type == "Owned" && (
+              <>
+                <ListNFT nft={nft} handleTrigger={handleTrigger} />
+                <TransferNFT nft={nft} handleTrigger={handleTrigger} />
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div className={style.infoRight}>
-        <div className={style.assetName}>#{nft.nftid} </div>
-      </div>
-    </div>
-    <div className={style.buttonsContainer}>
-      {nft.type == "Owned"&&(
-        <>
-          <ListNFT nft={nft} handleTrigger={handleTrigger} />
-          <TransferNFT nft={nft} handleTrigger={handleTrigger} />
-        </>
-      )
-      }
-    </div>
-  </div>
+      ));
 
-  ))
-
-  return myNfts
-
-
-
-
-
-
-
-}
-
-
-
-  
-
-
-
-  }, [selectedTab]);
-
-
-
-
+      return myNfts;
+    }
+  }, [selectedTab,refreshData]);
 
   // const sortDisplayNFTs = (nfts) => {
 
   //   console.log(selectedTab);
-    
+
   //  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   return (
     <>
@@ -393,7 +294,7 @@ console.log(listedNFTS);
             </div>
 
             <div className="flex flex-col md:flex-row gap-2 w-full ">
-              <div className=" flex flex-col px-4 py-4 w-full">
+              <div className=" flex flex-col px-4 py-2 md:py-4 w-full">
                 <span className="font-bold">Wallet ID:</span>
                 {user?.principal && (
                   <div className="flex flex-row gap-2  items-center">
@@ -412,17 +313,23 @@ console.log(listedNFTS);
                 )}
               </div>
 
-              <div className=" flex flex-col px-4 py-4 w-full">
+              <div className=" flex flex-col px-4 py-1 md:py-4 w-full">
                 <span className="font-bold">Balance:</span>
-                <div className="flex flex-row gap-2  items-center">
-                    <span className="flex justify-center items-center">
-                      {userIcpBalance ? userIcpBalance : <ClipLoader size={15} color="white"  />} ICP
+                <div className="flex flex-row   items-center">
+                  <span className="flex justify-center items-center">
+                    {userIcpBalance ? (
+                      userIcpBalance
+                    ) : (
+                      <ClipLoader size={15} color="white" />
+                    )}{" "}
+                    ICP
                   </span>
+                  <TransferICP/>
                 </div>
               </div>
             </div>
 
-            <div className=" flex flex-col px-4 py-4 w-full">
+            <div className=" flex flex-col px-4 py-1  md:py-4 w-full">
               <span className="font-bold">Account Identifier:</span>
 
               {user?.principal ? (
@@ -459,7 +366,7 @@ console.log(listedNFTS);
           </div>
 
           <SearchP selectedTab={selectedTab} handleTabClick={handleTabClick} />
-          <NftDisplay results={sortDisplayNFTs}/>
+          <NftDisplay results={sortDisplayNFTs} />
         </div>
       ) : (
         navigate("/")

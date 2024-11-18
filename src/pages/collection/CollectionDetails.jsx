@@ -170,7 +170,7 @@ const CollectionDetails = () => {
     
     // Filtering and sorting logic using memoization for performance
     const finalFilteredData = useMemo(() => {
-        let filteredProducts = [...listedNfts]; // Start with a copy of listedNfts
+        let filteredProducts = listedNfts?.length > 0 ? [...listedNfts] : []; // Start with a copy of listedNfts
     
         // Filter based on searchQuery
         if (searchQuery) {
@@ -186,8 +186,8 @@ const CollectionDetails = () => {
             );
         } else if (listedFilter === "all") {
             // If listedFilter is "all", we could reset to allTokens if needed
-            filteredProducts = allTokens;
-            console.log("all tokens :",allTokens);
+            filteredProducts = myTokens;
+            console.log("all tokens :",myTokens);
             
         }
     
@@ -217,7 +217,6 @@ const CollectionDetails = () => {
         const startIndex = currentPage * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         
-        console.log("hhhhhhhhhhhhhhhhhh:",filteredProducts);
         
         return filteredProducts?.slice(startIndex, endIndex).map((nft, index) => (
             <Card key={index} nft={nft} collectionID={collectionID} />

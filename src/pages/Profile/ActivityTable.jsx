@@ -107,7 +107,7 @@ const ActivityTable = ({ transactions, selectedCollection }) => {
         ) : (
           <div className="flex w-full justify-center items-center text-xs mt-3">
             
-            No offers available
+            No activity available
           </div>
         )}
       </tbody>

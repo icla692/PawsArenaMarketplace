@@ -39,6 +39,12 @@ const Home = () => {
     queryKey: ["collectionDetails"],
   });
 
+
+  const { data: refreshData} = useQuery({
+    queryKey: ["refreshData"],
+  });
+
+
   const [treiggerRefetch, setTriggerRefetch] = useState("");
 
   const fetchDetails = async () => {
@@ -56,6 +62,7 @@ const Home = () => {
         agent
       );
 
+      console.log("fetching user balance")
       const [balance, accountIdentifier] = await Promise.all([
         await icpActor.icrc1_balance_of({
           owner: user?.principal,
@@ -83,6 +90,8 @@ const Home = () => {
         user?.principal?.toString()
       );
 
+      console.log("done fetching")
+
       await queryClient.setQueryData(["userAccountId"], accountIdentifier);
       await queryClient.setQueryData(["userIcpBalance"], Number(balance) / 1e8);
       await queryClient.setQueryData(["IcpActor"], icpActor);
@@ -98,7 +107,7 @@ const Home = () => {
   useEffect(() => {
     //
     fetchDetails();
-  }, [user]);
+  }, [user,refreshData]);
 
   const replacer = (key, value) =>
     typeof value === "bigint" ? value.toString() : value;
@@ -175,14 +184,6 @@ const Home = () => {
    
 
     const fetchData = async()=>{
-
-      let combinedTokens = [];
-      let collectionData = []
-
-
-
-
-      
       if (!bulkData || !collectionDetails) {
         //trigger the refetching of the tokens
         setTriggerRefetch(Math.random().toString(36).substring(7));
@@ -211,22 +212,14 @@ const Home = () => {
       const combinedListings = [...nftIds];
       const lookup = Object.fromEntries(combinedListings.map(item => [item[0], item]));
       const updatedTokens = tokenListings[1]?.allNftTokens?.map(item => lookup[item[0]] ? lookup[item[0]] : item);
+      console.log("my tokens :",updatedTokens)
       queryClient.setQueryData(["myTokens"], updatedTokens);
       queryClient.setQueryData(["listedNfts"], updatedTokens);
   
       }
 
     }
-    
-
     fetchData()
-
-
-
-
-
-
-
   }, [bulkData, collectionDetails]);
 
   return (
@@ -247,7 +240,7 @@ const Home = () => {
       </div>
 
       <div className="md:flex mb-10 mt-2 justify-center items-center w-full">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div className="flex  gap-2">
           {[pic17].map((pic, index) => (
             <div key={index} className="relative">
               {isLoading && (

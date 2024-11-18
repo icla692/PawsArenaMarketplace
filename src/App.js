@@ -12,6 +12,8 @@ import { NFIDW } from "@nfid/identitykit";
 import Footer from "./pages/Footer";
 import { ClipLoader } from "react-spinners";
 import Error from "./pages/Error";
+import "react-loading-skeleton/dist/skeleton.css";
+
 
 // Lazy load pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));

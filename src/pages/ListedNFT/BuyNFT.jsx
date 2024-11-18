@@ -4,11 +4,12 @@ import { MARKETPLACE_CANISTER } from "../../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../../Utils/useFecth";
+import { useAgent } from "@nfid/identitykit/react";
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
- 
   const [isLoading, setIsLoading] = useState(false);
 
+  const authenticatedAgent = useAgent();
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
@@ -63,7 +64,8 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     try {
       if (!marketplaceActor) {
         displayNotificationModal("Log in first to purchase this NFT", "error");
-        return};
+        return;
+      }
       // if (!window.confirm("buy this nft?")) return;
 
       setIsLoading(true);
@@ -118,17 +120,18 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
         className="flex bg-[#2E8DEE] w-1/2 rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
         //  disabled={nft_price != undefined && userP == userPrincipal}
       >
-        {isLoading ? (
-          <ClipLoader size={20} color="white" />
-        ) : 
-        // userP == userPrincipal ? (
-        //   "View"
-        // )
-        
-  
-          "Buy now"
-        // ) :""
-      }
+        {
+          isLoading ? (
+            <ClipLoader size={20} color="white" />
+          ) : (
+            // userP == userPrincipal ? (
+            //   "View"
+            // )
+
+            "Buy now"
+          )
+          // ) :""
+        }
       </button>
     </>
   );

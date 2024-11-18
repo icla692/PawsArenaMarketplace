@@ -1,10 +1,16 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import useFetch from "../Utils/useFecth"; // Fixed typo in import
 import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { Principal } from "@dfinity/principal";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { MY_LEDGER_CANISTER_ID } from "../Utils/constants";
+import {idlFactory as ICPDL} from "../Utils/icptoken.did";
+import { createActor } from "../Utils/createActor";
+import { PiHandWithdrawBold } from "react-icons/pi";
+
+
 
 const TransferICP = () => {
   // State variables
@@ -18,11 +24,13 @@ const TransferICP = () => {
   const [modalType, setModalType] = useState(""); // "success" or "error"
 const {user} = useIdentityKit()
 const authenticatedAgent = useAgent()
+const queryClient = useQueryClient()
   // Fetch data using React Query
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } = useFetch();
 
   const { data: userIcpBalance } = useQuery({queryKey:["userIcpBalance"]});
   const { data: IcpActor } = useQuery({queryKey:["IcpActor"]});
+
 
 
   // const { data: userPrincipal } = useQuery({
@@ -53,9 +61,15 @@ const authenticatedAgent = useAgent()
     e.preventDefault();
     setButtonLoading(true);
 
-    if (!IcpActor) {alert("dd");return};
+    if (!authenticatedAgent) {return};
 
     try {
+
+      const IcpActor = createActor(MY_LEDGER_CANISTER_ID, ICPDL, authenticatedAgent);
+
+
+
+
       
       const transferResults = await IcpActor.icrc1_transfer({
         to: { owner: Principal.fromText(recipient), subaccount: [] },
@@ -67,16 +81,20 @@ const authenticatedAgent = useAgent()
       });
       
       console.log("dddd2",transferResults);
-      // if (transferResults.Ok) {
-      //   displayNotificationModal("ICP transfer successful", "success");
-      // } else {
-      //   displayNotificationModal(transferResults.Err, "error");
-      // }
+      if (transferResults.Ok) {
+        displayNotificationModal("ICP transfer successful", "success");
+      } else {
+        displayNotificationModal(transferResults.Err, "error");
+      }
+
     } catch (error) {
       console.error("Error in sending ICP:", error);
       displayNotificationModal("An error occurred during the transfer", "error");
     }
     
+
+    queryClient.setQueryData(["refreshData"], Math.random());
+
     setButtonLoading(false);
   };
 
@@ -91,10 +109,12 @@ const authenticatedAgent = useAgent()
   return (
     <div className="relative flex flex-row gap-1 text-white justify-center items-center p-2">
       <div className="flex flex-col justify-center items-center">
-        <button className="px-4 py-2 bg-white text-black rounded" onClick={() => setIsModalOpen(true)}>
-          Withdraw
-        </button>
-        <span>{userIcpBalance && userIcpBalance} ICP</span>
+        {/* <button className="px- py-2 bg-white text-black rounded" onClick={() => setIsModalOpen(true)}>
+          Withdra
+        </button> */}
+
+        <PiHandWithdrawBold size={20} className="cursor-pointer" onClick={()=>setIsModalOpen(true)} />
+        {/* <span>{userIcpBalance && userIcpBalance} ICP</span> */}
       </div>
 
       {/* Modal for withdrawal */}

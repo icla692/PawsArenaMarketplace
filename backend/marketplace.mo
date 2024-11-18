@@ -888,7 +888,7 @@ actor class () = this {
                                 token = data.token_identifier;
                                 seller = data.seller_principal;
                                 price = Nat64.fromNat(data.nft_price);
-                                buyer = caller;
+                                buyer = offer.user;
                                 time = Time.now();
                             };
 
