@@ -13,7 +13,8 @@ import Footer from "./pages/Footer";
 import { ClipLoader } from "react-spinners";
 import Error from "./pages/Error";
 import "react-loading-skeleton/dist/skeleton.css";
-
+import LoadGenes from "./pages/LoadGenes";
+import Test from "./pages/collection/Test"
 
 // Lazy load pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -58,6 +59,8 @@ function App() {
               path="/marketplace/:colID/:nftID"
               element={<ListedNFTDetails />}
             />
+                        <Route path="load" element={<Test />} />
+
             <Route path="*" element={<Error />} />
           </Routes>
         </Suspense>

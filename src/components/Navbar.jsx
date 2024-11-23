@@ -106,6 +106,8 @@ const Navbar = () => {
         <div className={style.headerItem} onClick={()=>navigate("/")}> Home </div>
         {/* <div className={style.headerItem}> Resources </div> */}
         <div className={style.headerItem}> About </div>
+        <div onClick={()=>navigate("/load")} className={style.headerItem}> Load </div>
+
         <div className={style.headerItem} onClick={toggleDropdown}>
           {user?.principal ? (
             <div className="flex flex-row justify-center border px-4 py-1 rounded-md items-center gap-8">

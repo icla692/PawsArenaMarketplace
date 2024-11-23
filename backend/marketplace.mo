@@ -75,7 +75,7 @@ actor class () = this {
                 return {
                     status = 200;
                     status_text = "Ok";
-                    data = data;
+                    data = ?data;
                     error_text = null;
                 };
             };
@@ -83,7 +83,7 @@ actor class () = this {
                 return {
                     status = 200;
                     status_text = "Ok";
-                    data = 0;
+                    data = ?0;
                     error_text = null;
                 };
             };

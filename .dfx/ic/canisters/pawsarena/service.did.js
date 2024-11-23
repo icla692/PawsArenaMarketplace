@@ -25,19 +25,25 @@ export const idlFactory = ({ IDL }) => {
     'nft_category' : NFT_CATEGORY__1,
     'seller_identifier' : IDL.Text,
   });
-  const Response_5 = IDL.Record({
+  const Response_6 = IDL.Record({
     'status' : IDL.Nat16,
     'data' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, ListedNFTData))),
     'status_text' : IDL.Text,
     'error_text' : IDL.Opt(IDL.Text),
   });
-  const Response_4 = IDL.Record({
+  const Response_7 = IDL.Record({
+    'status' : IDL.Nat16,
+    'data' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Nat))),
+    'status_text' : IDL.Text,
+    'error_text' : IDL.Opt(IDL.Text),
+  });
+  const Response_5 = IDL.Record({
     'status' : IDL.Nat16,
     'data' : IDL.Opt(IDL.Vec(ListedNFTData)),
     'status_text' : IDL.Text,
     'error_text' : IDL.Opt(IDL.Text),
   });
-  const Response_3 = IDL.Record({
+  const Response_4 = IDL.Record({
     'status' : IDL.Nat16,
     'data' : IDL.Opt(ListedNFTData),
     'status_text' : IDL.Text,
@@ -50,9 +56,15 @@ export const idlFactory = ({ IDL }) => {
     'buyer' : IDL.Principal,
     'price' : IDL.Nat64,
   });
-  const Response_2 = IDL.Record({
+  const Response_3 = IDL.Record({
     'status' : IDL.Nat16,
     'data' : IDL.Opt(IDL.Vec(SaleTransaction)),
+    'status_text' : IDL.Text,
+    'error_text' : IDL.Opt(IDL.Text),
+  });
+  const Response_2 = IDL.Record({
+    'status' : IDL.Nat16,
+    'data' : IDL.Opt(IDL.Nat),
     'status_text' : IDL.Text,
     'error_text' : IDL.Opt(IDL.Text),
   });
@@ -72,15 +84,17 @@ export const idlFactory = ({ IDL }) => {
         [Response],
         [],
       ),
-    'get_all_listed_nfts' : IDL.Func([], [Response_5], ['query']),
-    'get_all_test' : IDL.Func([], [Response_5], ['query']),
+    'get_all_listed_nfts' : IDL.Func([], [Response_6], ['query']),
+    'get_all_nft_views' : IDL.Func([], [Response_7], ['query']),
+    'get_all_test' : IDL.Func([], [Response_6], ['query']),
     'get_all_user_listed_nfts' : IDL.Func(
         [IDL.Principal],
-        [Response_4],
+        [Response_5],
         ['query'],
       ),
-    'get_listed_nft_details' : IDL.Func([IDL.Text], [Response_3], ['query']),
-    'get_nft_sale_history' : IDL.Func([IDL.Text], [Response_2], ['query']),
+    'get_listed_nft_details' : IDL.Func([IDL.Text], [Response_4], ['query']),
+    'get_nft_sale_history' : IDL.Func([IDL.Text], [Response_3], ['query']),
+    'get_nft_views' : IDL.Func([IDL.Text], [Response_2], ['query']),
     'init_list_nft' : IDL.Func(
         [IDL.Principal, IDL.Nat, NFT_CATEGORY, IDL.Nat],
         [Response],
@@ -92,6 +106,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'salesTransactions' : IDL.Func([], [Response_1], ['query']),
+    'save_nft_view' : IDL.Func([IDL.Text], [IDL.Text], []),
     'transferNftMarketplace' : IDL.Func(
         [IDL.Principal, IDL.Text, NFT_CATEGORY],
         [IDL.Bool],
