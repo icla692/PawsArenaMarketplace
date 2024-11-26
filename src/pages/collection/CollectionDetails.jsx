@@ -294,6 +294,16 @@ console.log("total pages :", totalPages);
           handleSearchChange={handleSearchChange}
           handleSortPriceChange={handleSortPriceChange}
           handlelistedChange={handlelistedChange}
+
+          traitsData={traitsData}
+                  handleOptionClick={handleOptionClick}
+                  handleSectionClick={handleSectionClick}
+                  expandedSections={expandedSections}
+                  selectedOptions={selectedOptions}
+                  setExpandedSections={setExpandedSections}
+                  setSelectedOptions={setSelectedOptions}
+
+
         />
         <ListedNFTs
           results={finalFilteredData}

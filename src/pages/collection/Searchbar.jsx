@@ -2,6 +2,7 @@ import React from "react";
 import { IoFilter } from "react-icons/io5";
 import Button from "../../Utils/Button";
 import { IoMdSearch } from "react-icons/io";
+import FilterSection from "./Test";
 
 const Searchbar = ({
   currentPage,
@@ -20,6 +21,13 @@ const Searchbar = ({
   minPrice,
   handleMaxPriceChange,
   handleMinPriceChange,
+  traitsData,
+  handleOptionClick,
+  handleSectionClick,
+  expandedSections,
+  selectedOptions,
+  setExpandedSections,
+  setSelectedOptions,
 }) => {
   return (
     <div className="flex flex-col w-full gap-4 p-2">
@@ -61,47 +69,49 @@ const Searchbar = ({
       </div>
       <div className="hidden md:flex-row md:block justify-between items-center cursor-pointer">
         <div className="flex flex-row justify-between items-center ">
-         <div className="flex mt-4">
-
-          <Button onClickHandler={handlelistedChange} value="all" title="All" />
-          <Button
-            onClickHandler={handlelistedChange}
-            value="listed"
-            title="Listed"
+          <div className="flex mt-4">
+            <Button
+              onClickHandler={handlelistedChange}
+              value="all"
+              title="All"
             />
-          <Button
-            onClickHandler={handlelistedChange}
-            value="hasoffers"
-            title="Has Offers"
+            <Button
+              onClickHandler={handlelistedChange}
+              value="listed"
+              title="Listed"
             />
-            </div>
+            <Button
+              onClickHandler={handlelistedChange}
+              value="hasoffers"
+              title="Has Offers"
+            />
+          </div>
           <div className="flex gap-4 items-center justify-center mt-4">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 0}
-            className={`px-4 py-1 bg-transparent border text-white rounded ${
-              currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Previous
-          </button>
-          <button
-            onClick={nextPage}
-            disabled={currentPage >= pages - 1}
-            className={`px-4 py-1 bg-transparent border text-white rounded ${
-              currentPage >= pages - 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Next
-          </button>
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 0}
+              className={`px-4 py-1 bg-transparent border text-white rounded ${
+                currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Previous
+            </button>
+            <button
+              onClick={nextPage}
+              disabled={currentPage >= pages - 1}
+              className={`px-4 py-1 bg-transparent border text-white rounded ${
+                currentPage >= pages - 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
-        </div>
-        
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 flex justify-center items-center z-50">
-          <div className="bg-[#202020] p-4 rounded-lg w-[90%] md:w-[400px]">
+        <div className="fixed inset-0 mt-[10vh] bg-gray-800 bg-opacity-70 flex justify-center items-center z-50 h-[100vh] overflow-y-scroll">
+          <div className="bg-[#202020] mt-[60vh] p-4 rounded-lg w-[90%] md:w-[400px]">
             <div className="flex w-full justify-between items-center">
               <h2 className="text-lg font-bold text-white mb-2">Filter</h2>
               <button
@@ -120,21 +130,25 @@ const Searchbar = ({
               className="p-1 rounded outline-none bg-gray-300 border-none mt-6 w-full"
             />
 
-<div className=" md:block  mt-6 justify-between items-center cursor-pointer">
-        <div>
-          <Button onClickHandler={handlelistedChange} value="all" title="All" />
-          <Button
-            onClickHandler={handlelistedChange}
-            value="listed"
-            title="Listed"
-          />
-          <Button
-            onClickHandler={handlelistedChange}
-            value="hasoffers"
-            title="Has Offers"
-          />
-        </div>
-        {/* <div className="flex gap-4 items-center justify-between mt-4">
+            <div className=" md:block  mt-6 justify-between items-center cursor-pointer">
+              <div>
+                <Button
+                  onClickHandler={handlelistedChange}
+                  value="all"
+                  title="All"
+                />
+                <Button
+                  onClickHandler={handlelistedChange}
+                  value="listed"
+                  title="Listed"
+                />
+                <Button
+                  onClickHandler={handlelistedChange}
+                  value="hasoffers"
+                  title="Has Offers"
+                />
+              </div>
+              {/* <div className="flex gap-4 items-center justify-between mt-4">
           <button
             onClick={prevPage}
             disabled={currentPage === 0}
@@ -154,7 +168,7 @@ const Searchbar = ({
             Next
           </button>
         </div> */}
-      </div>
+            </div>
 
             {/* Sort Options in Modal */}
             <select
@@ -191,7 +205,16 @@ const Searchbar = ({
               {/* Traits Section in Modal */}
               <div className="flex flex-col mt-4">
                 <span className="text-white">Traits</span>
-                {/* Add trait filters here */}
+
+                <FilterSection
+                  traitsData={traitsData}
+                  handleOptionClick={handleOptionClick}
+                  handleSectionClick={handleSectionClick}
+                  expandedSections={expandedSections}
+                  selectedOptions={selectedOptions}
+                  setExpandedSections={setExpandedSections}
+                  setSelectedOptions={setSelectedOptions}
+                />
               </div>
             </div>
           </div>
