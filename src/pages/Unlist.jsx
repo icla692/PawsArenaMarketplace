@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
@@ -18,7 +18,10 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
 
   const { invalidateListings, invalidateUserNfts } = useFecth();
   const authenticatedAgent = useAgent();
+
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
+
 
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
@@ -53,11 +56,13 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
 
       if (res?.status == 200 && res?.status_text == "Ok") {
         displayNotificationModal("NFT unlisted successfully", "success");
+        navigate("/profile");
       } else {
         displayNotificationModal(res?.error_text, "error");
+        navigate("/profile");
       }
       handleTrigger();
-      navigate("/profile");
+      queryClient.setQueryData(["refreshData"], Math.random());
       console.log("unlisting res :", res);
     } catch (error) {
       console.log("error in unlisting token :", error);
@@ -68,7 +73,7 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
     <div className="flex flex-col gap-1 w-1/2">
       <div className="flex flex-row gap-4">
         <button
-          className="flex bg-[#2c2d2e] rounded-lg w-full mt-4 font-bold text-white justify-center items-center p-2 cursor-pointer"
+          className="flex bg-[#2c2d2e] rounded-lg w-full mt-4 text-white justify-center items-center p-2 cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         >
           Unlist

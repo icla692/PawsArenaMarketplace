@@ -15,7 +15,7 @@ import BuyNow from "../BuyNow";
 import Card from "./Card";
 import Sidebar from "./Sidebar";
 import { ClipLoader } from "react-spinners";
-import Test from "./Test";
+import FilterSection from "./Test";
 const ListedNFTs = ({
   results,
   isSidebarOpen,
@@ -59,9 +59,9 @@ const ListedNFTs = ({
             </div>
 
             <div className="flex flex-col mt-4">
-              <span>Traits</span>
+              {/* <span>Traits</span> */}
               {collectionID === "rw7qm-eiaaa-aaaak-aaiqq-cai" && (
-                <Test
+                <FilterSection
                   traitsData={traitsData}
                   handleOptionClick={handleOptionClick}
                   handleSectionClick={handleSectionClick}

@@ -4,7 +4,11 @@ import useFecth from "../Utils/useFecth";
 import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { computeExtTokenIdentifier } from "../Utils/tid";
-import { MARKETPLACE_CANISTER, PAWS_ARENA_CANISTER } from "../Utils/constants";
+import {
+  isPrincipalOrAccount,
+  MARKETPLACE_CANISTER,
+  PAWS_ARENA_CANISTER,
+} from "../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { createActor } from "../Utils/createActor";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
@@ -60,6 +64,20 @@ const TransferNFT = ({ nft, handleTrigger }) => {
       nft.canister_id
     );
 
+    //check if the recipient is a valid principal or account identifier
+
+    let isPrincipal = isPrincipalOrAccount(recipient);
+
+    if (isPrincipal === "unkown") {
+      alert("invalid recipient");
+      return;
+    }
+
+    let _reciever =
+      isPrincipal === "pa"
+        ? { principal: Principal.fromText(recipient) }
+        : { address: recipient };
+
     try {
       let transferResults = await nftActor.transfer({
         amount: parseInt(1),
@@ -67,7 +85,7 @@ const TransferNFT = ({ nft, handleTrigger }) => {
         memo: [],
         notify: false,
         subaccount: [],
-        to: { address: recipient },
+        to: _reciever,
         token: tokenIdentifier,
       });
 
@@ -89,9 +107,9 @@ const TransferNFT = ({ nft, handleTrigger }) => {
   };
 
   return (
-    <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
+    <div className="relative flex-row gap-1 flex w-full text-sm  text-white justify-center items-center p-2 ">
       <button
-        className="flex border bg-slate-300 w-full mt-4 font-bold text-black justify-center items-center p-2"
+        className="flex border bg-slate-300 w-full mt-4  text-black justify-center items-center p-1"
         onClick={() => setIsModalOpen(true)}
       >
         Transfer
@@ -114,7 +132,7 @@ const TransferNFT = ({ nft, handleTrigger }) => {
           )}
           <div className="bg-[#252525] rounded-lg shadow-lg p-6 w-96">
             <div className="flex justify-between ">
-              <h2 className="text-xl font-bold mb-4">Transfer NFT</h2>
+              <h2 className="text-sm mb-4">Transfer NFT</h2>
               <CgClose
                 className="cursor-pointer"
                 onClick={() => setIsModalOpen(false)}
@@ -125,7 +143,7 @@ const TransferNFT = ({ nft, handleTrigger }) => {
               <input
                 type="text"
                 id="recipient"
-                placeholder="enter recipient account"
+                placeholder="enter receiver account or principal address"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 className=" border border-white text-black rounded p-1 w-full mb-4"

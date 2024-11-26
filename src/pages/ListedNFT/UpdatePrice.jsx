@@ -89,7 +89,7 @@ const UpdatePrice = ({ nft, handleTrigger }) => {
         </div>
       )}
       <button
-        className="flex bg-[#6fa0d1] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+        className="flex bg-[#6fa0d1] w-full rounded-lg mt-4 text-white justify-center items-center p-2"
         onClick={() => setUpdateModal(true)}
       >
         Update

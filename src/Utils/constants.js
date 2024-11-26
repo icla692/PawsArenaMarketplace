@@ -10,17 +10,31 @@ export const NFTCollections = [
     imageUrl: "https://hdem4-ryaaa-aaaam-qa4xa-cai.raw.ic0.app/?index=70",
   },
 ];
-
-
-
-
+export const getColorFromId = (id) => {
+  for (const traitData of traitsData) {
+    const traitName =
+      traitData.trait === "Background"
+        ? "bg"
+        : traitData.trait.replace(/\s+/g, "").toLowerCase();
+    for (let index = 0; index < traitData.colors.length; index++) {
+      const colorId = `${traitName}${index + 1}`;
+      if (colorId === id) {
+        return [traitData.trait, traitData.colors[index]];
+      }
+    }
+  }
+  // return null;
+};
 export function getUnixTimestampInNanoseconds(days) {
   const now = new Date();
   const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   const unixTimestampInNanoseconds = futureDate.getTime() * 1e6; // 1 second = 1e9 nanoseconds
   return unixTimestampInNanoseconds;
 }
-
+export const shortenAddress = (address) => {
+  if (!address) return "";
+  return `${address.slice(0, 10)}...${address.slice(-5)}`;
+};
 
 export const traitsData = [
   {
@@ -288,8 +302,29 @@ export const traitsData = [
       "Queen Crown",
     ],
   },
-  // {
-  //   trait: "Gender",
-  //   colors: ["Boy", "Girl"],
-  // },
+  
 ];
+
+export const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+  });
+};
+
+
+export function isPrincipalOrAccount(address) {
+  // Principal addresses typically contain dashes and are 63 characters long
+  const principalRegex = /^[a-z0-9\-]{63}$/;
+  
+  // Account identifiers are typically 64 character hex strings
+  const accountIdRegex = /^[a-f0-9]{64}$/;
+
+  if (principalRegex.test(address)) {
+    return "pa";
+  } else if (accountIdRegex.test(address)) {
+    return "ac";
+  } else {
+    return "unknown";
+  }
+}

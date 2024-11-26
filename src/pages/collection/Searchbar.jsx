@@ -35,7 +35,7 @@ const Searchbar = ({
           <input
             type="text"
             className="hidden md:block bg-transparent border outline-none border-gray-300 text-white rounded-lg w-full pl-10 p-2.5"
-            placeholder="Search by name or trait"
+            placeholder="Search by NFT number"
             onChange={handleSearchChange}
             value={searchQuery}
           />

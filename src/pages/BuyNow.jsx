@@ -95,7 +95,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   };
 
   return (
-    <>
+    <div className="flex w-1/2">
       {showModal && (
         <div
           className={`absolute top-10 z-50 text-xs  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
@@ -112,11 +112,11 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
 
       <button
         onClick={() => HandleBuy()}
-        className="flex w-full bg-[#2E8DEE] rounded-b-lg mt-4 font-bold text-white justify-center items-center p-2"
+        className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
       >
         {isLoading ? <ClipLoader size={20} color="white" /> : "Buy"}
       </button>
-    </>
+    </div>
   );
 };
 

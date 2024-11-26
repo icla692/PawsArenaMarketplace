@@ -5,12 +5,10 @@ import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { Principal } from "@dfinity/principal";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
-import { MY_LEDGER_CANISTER_ID } from "../Utils/constants";
-import {idlFactory as ICPDL} from "../Utils/icptoken.did";
+import { isPrincipalOrAccount, MY_LEDGER_CANISTER_ID } from "../Utils/constants";
+import { idlFactory as ICPDL } from "../Utils/icptoken.did";
 import { createActor } from "../Utils/createActor";
 import { PiHandWithdrawBold } from "react-icons/pi";
-
-
 
 const TransferICP = () => {
   // State variables
@@ -22,16 +20,15 @@ const TransferICP = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
-const {user} = useIdentityKit()
-const authenticatedAgent = useAgent()
-const queryClient = useQueryClient()
+  const { user } = useIdentityKit();
+  const authenticatedAgent = useAgent();
+  const queryClient = useQueryClient();
   // Fetch data using React Query
-  const { invalidateListings, invalidateUserNfts, invalidateUserBalance } = useFetch();
+  const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =
+    useFetch();
 
-  const { data: userIcpBalance } = useQuery({queryKey:["userIcpBalance"]});
-  const { data: IcpActor } = useQuery({queryKey:["IcpActor"]});
-
-
+  const { data: userIcpBalance } = useQuery({ queryKey: ["userIcpBalance"] });
+  const { data: IcpActor } = useQuery({ queryKey: ["IcpActor"] });
 
   // const { data: userPrincipal } = useQuery({
   //   queryKey: ["userPrincipal"],
@@ -61,42 +58,54 @@ const queryClient = useQueryClient()
     e.preventDefault();
     setButtonLoading(true);
 
-    if (!authenticatedAgent) {return};
-
-    try {
-
-      const IcpActor = createActor(MY_LEDGER_CANISTER_ID, ICPDL, authenticatedAgent);
-
-
-
-
-      
-      const transferResults = await IcpActor.icrc1_transfer({
-        to: { owner: Principal.fromText(recipient), subaccount: [] },
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        amount: Number(amount) * 1e8,
-      });
-      
-      console.log("dddd2",transferResults);
-      if (transferResults.Ok) {
-        displayNotificationModal("ICP transfer successful", "success");
-      } else {
-        displayNotificationModal(transferResults.Err, "error");
-      }
-
-    } catch (error) {
-      console.error("Error in sending ICP:", error);
-      displayNotificationModal("An error occurred during the transfer", "error");
+    if (!authenticatedAgent) {
+      return;
     }
-    
 
+    let isPrincipal = isPrincipalOrAccount(recipient)
+alert("isPrincipal : "+isPrincipal)
+    // try {
+    //   const IcpActor = createActor(
+    //     MY_LEDGER_CANISTER_ID,
+    //     ICPDL,
+    //     authenticatedAgent
+    //   );
+
+    //   const transferResults = await IcpActor.icrc1_transfer({
+    //     to: { owner: Principal.fromText(recipient), subaccount: [] },
+    //     fee: [],
+    //     memo: [],
+    //     from_subaccount: [],
+    //     created_at_time: [],
+    //     amount: Number(amount) * 1e8,
+    //   });
+
+    //   console.log("dddd2", transferResults);
+    //   if (transferResults.Ok) {
+    //     displayNotificationModal("ICP transfer successful", "success");
+    //   } else {
+    //     displayNotificationModal(transferResults.Err, "error");
+    //   }
+    // } catch (error) {
+    //   console.error("Error in sending ICP:", error);
+    //   displayNotificationModal(
+    //     "An error occurred during the transfer",
+    //     "error"
+    //   );
+    // }
+
+
+    
     queryClient.setQueryData(["refreshData"], Math.random());
 
     setButtonLoading(false);
   };
+
+
+
+
+
+
 
   // Function to handle preview action
   const handlePreview = (e) => {
@@ -113,7 +122,11 @@ const queryClient = useQueryClient()
           Withdra
         </button> */}
 
-        <PiHandWithdrawBold size={20} className="cursor-pointer" onClick={()=>setIsModalOpen(true)} />
+        <PiHandWithdrawBold
+          size={20}
+          className="cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
+        />
         {/* <span>{userIcpBalance && userIcpBalance} ICP</span> */}
       </div>
 
@@ -122,14 +135,20 @@ const queryClient = useQueryClient()
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           {/* Notification Modal */}
           {showModal && (
-            <div className={`absolute text-xs top-10 z-50 left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${modalType === "success" ? "bg-green-100 text-green-800 border border-green-300" : "bg-red-100 text-red-800 border border-red-300"} rounded-lg p-1`}>
+            <div
+              className={`absolute text-xs top-10 z-50 left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
+                modalType === "success"
+                  ? "bg-green-100 text-green-800 border border-green-300"
+                  : "bg-red-100 text-red-800 border border-red-300"
+              } rounded-lg p-1`}
+            >
               <p>{modalMessage}</p>
             </div>
           )}
 
           {/* Preview or Input Form */}
           {isPreviewOpen ? (
-            <PreviewSection 
+            <PreviewSection
               recipient={recipient}
               amount={amount}
               buttonLoading={buttonLoading}
@@ -140,7 +159,7 @@ const queryClient = useQueryClient()
               }}
             />
           ) : (
-            <InputSection 
+            <InputSection
               recipient={recipient}
               amount={amount}
               buttonLoading={buttonLoading}
@@ -157,7 +176,15 @@ const queryClient = useQueryClient()
 };
 
 // Component for Input Form
-const InputSection = ({ recipient, amount, buttonLoading, onPreview, onRecipientChange, onAmountChange, onClose }) => (
+const InputSection = ({
+  recipient,
+  amount,
+  buttonLoading,
+  onPreview,
+  onRecipientChange,
+  onAmountChange,
+  onClose,
+}) => (
   <div className="bg-[#252525] rounded-lg text-sm shadow-lg p-6 w-96">
     <div className="flex justify-between">
       <h2 className="mb-4">Withdraw ICP</h2>
@@ -187,7 +214,10 @@ const InputSection = ({ recipient, amount, buttonLoading, onPreview, onRecipient
         {buttonLoading ? (
           <ClipLoader color="white" size={20} />
         ) : (
-          <button type="submit" className="px-4 py-2 bg-white text-black rounded">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-white text-black rounded"
+          >
             Preview
           </button>
         )}
@@ -195,10 +225,17 @@ const InputSection = ({ recipient, amount, buttonLoading, onPreview, onRecipient
     </form>
   </div>
 );
-const shortenAddress = (address) => `${address.slice(0, 15)}...${address.slice(-10)}`;
+const shortenAddress = (address) =>
+  `${address.slice(0, 15)}...${address.slice(-10)}`;
 
 // Component for Preview Section
-const PreviewSection = ({ recipient, amount, buttonLoading, onWithdraw, onClose }) => (
+const PreviewSection = ({
+  recipient,
+  amount,
+  buttonLoading,
+  onWithdraw,
+  onClose,
+}) => (
   <div className="bg-[#252525] text-sm rounded-lg shadow-lg p-6 w-96">
     <div className="flex justify-between">
       <h2 className="text-xl border-b w-full mb-4">Withdraw Preview</h2>
@@ -215,7 +252,10 @@ const PreviewSection = ({ recipient, amount, buttonLoading, onWithdraw, onClose 
       {buttonLoading ? (
         <ClipLoader color="white" size={20} />
       ) : (
-        <button onClick={onWithdraw} className="px-4 py-2 bg-white text-black rounded">
+        <button
+          onClick={onWithdraw}
+          className="px-4 py-2 bg-white text-black rounded"
+        >
           Send
         </button>
       )}

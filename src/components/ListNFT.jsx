@@ -10,14 +10,14 @@ import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { createActor } from "../Utils/createActor";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { idlFactory as PawsIDL } from "../Utils/paws.did";
-const ListNFT = ({ nft,handleTrigger }) => {
+const ListNFT = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrice, setNewPrice] = useState(0);
   const [buttonLoading, setButtonLoading] = useState(false);
-const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-const {invalidateListings} = useFecth()
-const authenticatedAgent = useAgent()
+  const { invalidateListings } = useFecth();
+  const authenticatedAgent = useAgent();
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -34,25 +34,22 @@ const authenticatedAgent = useAgent()
     queryKey: ["userPrincipal"],
   });
 
-  const {user} = useIdentityKit()
- 
+  const { user } = useIdentityKit();
 
   const { mutateAsync: HandleList } = useMutation({
     mutationFn: (e) => handleList(e),
     onSuccess: async () => {
-       invalidateListings()
+      invalidateListings();
       setButtonLoading(false);
     },
   });
 
 
 
-
   const handleList = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    
-    if ( !user || !nft || !authenticatedAgent) return;
+    if (!user || !nft || !authenticatedAgent) return;
 
     let marketplaceActor = createActor(
       MARKETPLACE_CANISTER,
@@ -60,8 +57,11 @@ const authenticatedAgent = useAgent()
       authenticatedAgent
     );
 
-    let nftActor = createActor(PAWS_ARENA_CANISTER,PawsIDL,authenticatedAgent)
-
+    let nftActor = createActor(
+      PAWS_ARENA_CANISTER,
+      PawsIDL,
+      authenticatedAgent
+    );
 
     if (newPrice == 0) {
       alert("price is zero");
@@ -117,18 +117,17 @@ const authenticatedAgent = useAgent()
       console.log("Error in listing NFT:", error);
     }
 
-    queryClient.setQueryData(["refreshData"], Math.random());
-
-    // handleTrigger()
+    queryClient.setQueryData(["refreshData"], Math.random().toString());
   };
 
   return (
-    <div className="relative flex-row gap-1 flex w-full font-bold text-white justify-center items-center p-2 ">
-      <button 
-
-className="flex bg-gray-300 w-full border mt-4 font-bold text-black justify-center items-center p-2"
-      
-      onClick={() => setIsModalOpen(true)}>List</button>
+    <div className="relative flex-row gap-1 flex w-full text-white justify-center items-center p-2 ">
+      <button
+        className="flex bg-gray-300 w-full border mt-4  text-black justify-center items-center p-1"
+        onClick={() => setIsModalOpen(true)}
+      >
+        List
+      </button>
 
       {isModalOpen && (
         <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -145,9 +144,9 @@ className="flex bg-gray-300 w-full border mt-4 font-bold text-black justify-cent
               </div>
             </div>
           )}
-          <div className="bg-[#252525] rounded-lg shadow-lg p-6 w-96">
+          <div className="bg-[#252525] text-sm rounded-lg shadow-lg p-6 w-96">
             <div className="flex justify-between ">
-              <h2 className="text-xl font-bold mb-4">List NFT</h2>
+              <h2 className=" text-sm mb-4">List NFT</h2>
               <CgClose
                 className="cursor-pointer"
                 onClick={() => setIsModalOpen(false)}
@@ -155,15 +154,16 @@ className="flex bg-gray-300 w-full border mt-4 font-bold text-black justify-cent
             </div>
 
             <form onSubmit={HandleList}>
-              <label className="block mb-2" htmlFor="price">
+              {/* <span className=" mb-2 text-sm block text-gray-500">
                 Enter listing price
-              </label>
+              </span> */}
               <input
                 type="number"
                 id="price"
                 value={newPrice}
+                placeholder="enter listing price in icp"
                 onChange={(e) => setNewPrice(e.target.value)}
-                className=" border border-white text-black rounded p-1 w-full mb-4"
+                className="border border-white text-black rounded p-1 w-full mb-4"
                 required
               />
               <div className="flex justify-end">
@@ -181,9 +181,6 @@ className="flex bg-gray-300 w-full border mt-4 font-bold text-black justify-cent
             </form>
           </div>
         </div>
-
-
-
       )}
     </div>
   );

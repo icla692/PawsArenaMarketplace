@@ -31,6 +31,7 @@ const Home = () => {
 
   const agent = new HttpAgent({ host: HOST, retryTimes: 10 });
 
+
   const { data: bulkData } = useQuery({
     queryKey: ["bulkData"],
   });
@@ -178,7 +179,7 @@ const Home = () => {
     };
 
     loadData();
-  }, [treiggerRefetch]);
+  }, [treiggerRefetch,refreshData]);
 
   useEffect(() => {
    
@@ -220,7 +221,7 @@ const Home = () => {
 
     }
     fetchData()
-  }, [bulkData, collectionDetails]);
+  }, [bulkData, collectionDetails, refreshData]);
 
   return (
     <div

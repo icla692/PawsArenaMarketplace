@@ -17,6 +17,9 @@ import { ClipLoader } from "react-spinners";
 import SearchP from "./Profile/SearchP";
 import NftDisplay from "./Profile/DisplayNFTs";
 import ActivityTable from "./Profile/ActivityTable";
+import { BsCopy } from "react-icons/bs";
+import { copyToClipboard } from "../Utils/constants";
+import Balance from "../components/Balance";
 
 const style = {
   wrapper: `flex mt-[80px] min-h-screen bg-[#121212] flex-col w-full items-center px-[1.2rem] md:px-[4.2rem] py-4 text-white`,
@@ -178,8 +181,10 @@ const Profile = () => {
       let filteredTransactions = tokenListings[1]?.transactions?.filter(
         (trans) =>
           trans?.buyer ==
-            "8edb53debf13d254295dbcbf1a888b0723a7f853a181e91e9518ec871fb934a6" ||
-          trans?.seller === user?.principal
+            AccountIdentifier.fromPrincipal({
+              principal: user.principal,
+              subAccount: undefined,
+            }).toHex() || trans?.seller === user?.principal
       );
 
       console.log("transactions :", filteredTransactions);
@@ -205,8 +210,8 @@ const Profile = () => {
             alt=""
             onClick={() =>
               navigate(
-                nft.type === "Listed" &&
-                  "../marketplace/" + nft.canister_id + "/" + nft.nftid
+                // nft.type === "Listed" &&
+                "../marketplace/" + nft.canister_id + "/" + nft.nftid
                 // : "../nft/" + nft.canister_id + "/" + nft.nftid
               )
             }
@@ -276,13 +281,7 @@ const Profile = () => {
 
       return myNfts;
     }
-  }, [selectedTab,refreshData]);
-
-  // const sortDisplayNFTs = (nfts) => {
-
-  //   console.log(selectedTab);
-
-  //  }
+  }, [selectedTab, refreshData]);
 
   return (
     <>
@@ -292,40 +291,23 @@ const Profile = () => {
             <div className="flex rounded-t-md text-black font-bold px-4 bg-white">
               Overview
             </div>
-
-            <div className="flex flex-col md:flex-row gap-2 w-full ">
+            <div className="flex flex-col justify-center md:flex-row gap-2 w-full ">
               <div className=" flex flex-col px-4 py-2 md:py-4 w-full">
                 <span className="font-bold">Wallet ID:</span>
                 {user?.principal && (
                   <div className="flex flex-row gap-2  items-center">
-                    <span className="flex flex-row justify-center items-center">
+                    <span className="flex flex-row justify-center  items-center">
                       {shortenAddress(user?.principal?.toString(), 20)}
                     </span>
-
-                    <AiOutlineCopy
-                      size={25}
-                      className="cursor-pointer border rounded-md p-1 hover:text-lg"
-                      onClick={() =>
-                        handleCopyAddress(user?.principal?.toText())
-                      }
+                    <BsCopy
+                      className="cursor-pointer"
+                      onClick={() => copyToClipboard(user?.principal?.toText())}
                     />
                   </div>
                 )}
               </div>
-
-              <div className=" flex flex-col px-4 py-1 md:py-4 w-full">
-                <span className="font-bold">Balance:</span>
-                <div className="flex flex-row   items-center">
-                  <span className="flex justify-center items-center">
-                    {userIcpBalance ? (
-                      userIcpBalance
-                    ) : (
-                      <ClipLoader size={15} color="white" />
-                    )}{" "}
-                    ICP
-                  </span>
-                  <TransferICP/>
-                </div>
+              <div className="flex flex-col px-4 py-1  md:py-4 w-full">
+                <Balance />
               </div>
             </div>
 
@@ -343,11 +325,10 @@ const Profile = () => {
                     )}
                   </span>
 
-                  <AiOutlineCopy
-                    size={25}
-                    className="cursor-pointer border rounded-md p-1 hover:text-lg"
+                  <BsCopy
+                    className="cursor-pointer"
                     onClick={() =>
-                      handleCopyAddress(
+                      copyToClipboard(
                         AccountIdentifier.fromPrincipal({
                           principal: user.principal,
                         })?.toHex()
@@ -359,10 +340,6 @@ const Profile = () => {
                 <ClipLoader />
               )}
             </div>
-
-            {/* <TransferICP /> */}
-
-            {/* <div>{userIcpBalance && userIcpBalance} ICP</div> */}
           </div>
 
           <SearchP selectedTab={selectedTab} handleTabClick={handleTabClick} />

@@ -195,11 +195,7 @@ const CollectionDetails = () => {
     let filteredProducts = listedNfts?.length > 0 ? [...listedNfts] : []; // Start with a copy of listedNfts
 
     // Filter based on searchQuery
-    if (searchQuery) {
-      filteredProducts = filteredProducts?.filter((nft) =>
-        nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+    
 
     // Apply the listedFilter
     if (listedFilter === "listed") {
@@ -212,6 +208,12 @@ const CollectionDetails = () => {
       console.log("all tokens :", myTokens);
     }
 
+
+    if (searchQuery) {
+        filteredProducts = filteredProducts?.filter((nft) =>
+          nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      } 
     // Apply price filtering if minPrice or maxPrice is set
     if (minPrice) {
       filteredProducts = filteredProducts?.filter(
