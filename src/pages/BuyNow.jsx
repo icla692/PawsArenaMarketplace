@@ -112,7 +112,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
 
       <button
         onClick={() => HandleBuy()}
-        className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 font-bold text-white justify-center items-center p-2"
+        className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 text-white justify-center items-center p-2"
       >
         {isLoading ? <ClipLoader size={20} color="white" /> : "Buy"}
       </button>

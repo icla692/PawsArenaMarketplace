@@ -103,11 +103,6 @@ const ListNFT = ({ nft, handleTrigger }) => {
       );
       console.log("final listing:", res);
 
-      // if (fin.status === 200 && fin.status_text === "Ok") {
-      //   alert("NFT listed successfully");
-      // } else {
-      //   alert(fin.status_error);
-      // }
       if (res?.status == 200 && res?.status_text == "Ok") {
         displayNotificationModal("NFT listed successfully", "success");
       } else {

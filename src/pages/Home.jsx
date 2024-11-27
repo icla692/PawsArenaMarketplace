@@ -31,7 +31,6 @@ const Home = () => {
 
   const agent = new HttpAgent({ host: HOST, retryTimes: 10 });
 
-
   const { data: bulkData } = useQuery({
     queryKey: ["bulkData"],
   });
@@ -40,11 +39,9 @@ const Home = () => {
     queryKey: ["collectionDetails"],
   });
 
-
-  const { data: refreshData} = useQuery({
+  const { data: refreshData } = useQuery({
     queryKey: ["refreshData"],
   });
-
 
   const [treiggerRefetch, setTriggerRefetch] = useState("");
 
@@ -63,7 +60,7 @@ const Home = () => {
         agent
       );
 
-      console.log("fetching user balance")
+      console.log("fetching user balance");
       const [balance, accountIdentifier] = await Promise.all([
         await icpActor.icrc1_balance_of({
           owner: user?.principal,
@@ -91,7 +88,7 @@ const Home = () => {
         user?.principal?.toString()
       );
 
-      console.log("done fetching")
+      console.log("done fetching");
 
       await queryClient.setQueryData(["userAccountId"], accountIdentifier);
       await queryClient.setQueryData(["userIcpBalance"], Number(balance) / 1e8);
@@ -108,7 +105,7 @@ const Home = () => {
   useEffect(() => {
     //
     fetchDetails();
-  }, [user,refreshData]);
+  }, [user, refreshData]);
 
   const replacer = (key, value) =>
     typeof value === "bigint" ? value.toString() : value;
@@ -117,11 +114,11 @@ const Home = () => {
     const loadData = async () => {
       let bulkDataArray = [];
       let collectionDetailsArray = [];
-      
-      if (bulkData && collectionDetails) {
-        console.log("Data already present");
-        return;
-      }
+
+      // if (bulkData && collectionDetails) {
+      //   console.log("Data already present");
+      //   return;
+      // }
 
       setIsLoading(true);
 
@@ -163,7 +160,6 @@ const Home = () => {
               floorprice: nftStats[3],
               totalListed: nftStats[4],
             });
-
           } catch (error) {
             console.error("Error loading NFT data:", error);
           }
@@ -179,50 +175,53 @@ const Home = () => {
     };
 
     loadData();
-  }, [treiggerRefetch,refreshData]);
+  }, [treiggerRefetch, refreshData]);
 
   useEffect(() => {
-   
-
-    const fetchData = async()=>{
+    const fetchData = async () => {
       if (!bulkData || !collectionDetails) {
         //trigger the refetching of the tokens
         setTriggerRefetch(Math.random().toString(36).substring(7));
-        return
+        return;
       }
-  
-        const marketActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
-        const marketNFTsResponse = await marketActor?.get_all_listed_nfts();
-  
 
-      for(const collection of NFTCollections){
+      const marketActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
+      const marketNFTsResponse = await marketActor?.get_all_listed_nfts();
+
+      for (const collection of NFTCollections) {
         // const filteredCollection = NFTCollections.find(col => col.canisterId === collection.canisterId);
-        const filteredMarketNFTs = marketNFTsResponse?.data[0]?.filter(nft => nft[1].nft_canister == collection.canisterId) || [];
+        const filteredMarketNFTs =
+          marketNFTsResponse?.data[0]?.filter(
+            (nft) => nft[1].nft_canister == collection.canisterId
+          ) || [];
 
-        const nftIds = filteredMarketNFTs?.map(nft => [
+        const nftIds = filteredMarketNFTs?.map((nft) => [
           nft[1].nft_id,
           {
-              locked: [],
-              seller: nft[1].seller_principal,
-              price: nft[1].nft_price,
-              inhouse_sale: true,
+            locked: [],
+            seller: nft[1].seller_principal,
+            price: nft[1].nft_price,
+            inhouse_sale: true,
           },
-      ]);
+        ]);
 
-      let tokenListings = bulkData?.find((det)=>det[0] == collection.canisterId)
-      const combinedListings = [...nftIds];
-      const lookup = Object.fromEntries(combinedListings.map(item => [item[0], item]));
-      const updatedTokens = tokenListings[1]?.allNftTokens?.map(item => lookup[item[0]] ? lookup[item[0]] : item);
-      console.log("my tokens :",updatedTokens)
-      queryClient.setQueryData(["myTokens"], updatedTokens);
-      queryClient.setQueryData(["listedNfts"], updatedTokens);
-  
+        let tokenListings = bulkData?.find(
+          (det) => det[0] == collection.canisterId
+        );
+        const combinedListings = [...nftIds];
+        const lookup = Object.fromEntries(
+          combinedListings.map((item) => [item[0], item])
+        );
+        const updatedTokens = tokenListings[1]?.allNftTokens?.map((item) =>
+          lookup[item[0]] ? lookup[item[0]] : item
+        );
+        console.log("my tokens :", updatedTokens);
+        queryClient.setQueryData(["myTokens"], updatedTokens);
+        queryClient.setQueryData(["listedNfts"], updatedTokens);
       }
-
-    }
-    fetchData()
+    };
+    fetchData();
   }, [bulkData, collectionDetails, refreshData]);
-
   return (
     <div
       className="w-full p-8 md:mt-[20px] min-h-screen flex m flex-col text-white"

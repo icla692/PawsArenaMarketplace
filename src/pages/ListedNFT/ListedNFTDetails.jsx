@@ -295,9 +295,7 @@ const ListedNFTDetails = () => {
                     )}
                   </div>
                 )}
-
                 <SaleHistory history={saleHistory} />
-
                 <Offers
                   offers={nftDetails?.offers}
                   nft={nftDetails?.token_identifier}

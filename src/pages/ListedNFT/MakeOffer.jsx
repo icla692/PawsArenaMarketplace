@@ -98,7 +98,7 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
   });
 
   return (
-    <div className="flex bg-[#2c2d2e] w-1/2 rounded-lg mt-4 font-bold text-white justify-center items-center p-2 cursor-pointer">
+    <div className="flex bg-[#2c2d2e] w-1/2 rounded-lg mt-4 text-white justify-center items-center p-2 cursor-pointer">
       <button onClick={() => setOfferModalOpen(true)}>Make Offer</button>
 
       {isOfferModalOpen && (

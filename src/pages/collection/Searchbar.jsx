@@ -124,7 +124,7 @@ const Searchbar = ({
             {/* Search Bar in Modal */}
             <input
               type="text"
-              placeholder="Search by name or trait..."
+              placeholder="Search by nft number"
               value={searchQuery}
               onChange={handleSearchChange}
               className="p-1 rounded outline-none bg-gray-300 border-none mt-6 w-full"
@@ -148,7 +148,7 @@ const Searchbar = ({
                   title="Has Offers"
                 />
               </div>
-              {/* <div className="flex gap-4 items-center justify-between mt-4">
+              <div className="flex gap-4 items-center justify-between mt-4">
           <button
             onClick={prevPage}
             disabled={currentPage === 0}
@@ -167,7 +167,7 @@ const Searchbar = ({
           >
             Next
           </button>
-        </div> */}
+        </div>
             </div>
 
             {/* Sort Options in Modal */}

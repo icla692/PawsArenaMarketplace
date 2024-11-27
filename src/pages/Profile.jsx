@@ -182,7 +182,7 @@ const Profile = () => {
         (trans) =>
           trans?.buyer ==
             AccountIdentifier.fromPrincipal({
-              principal: user.principal,
+              principal: user?.principal,
               subAccount: undefined,
             }).toHex() || trans?.seller === user?.principal
       );
