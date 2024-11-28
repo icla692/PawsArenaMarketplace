@@ -26,7 +26,6 @@ actor class () = this {
     stable var MARKEPTLACE_ACCOUNT_IDENTIFIER : Text = "5a1ed575be49c5e9971dceb72e19821da9e26206572a333177f6dc46933b00cc";
 
     let icp_token_canister = actor ("ryjl3-tyaaa-aaaaa-aaaba-cai") : IcptokenTypes.Self;
-
     stable var nftOfferCount : Nat32 = 0;
 
     private stable var NftListings : [(Text, ListNFTData)] = [];
@@ -45,7 +44,7 @@ actor class () = this {
         Text.hash,
     );
 
-//track the view for the different nfts
+    //track the view for the different nfts
     private stable var NftViews : [(Text, Nat)] = [];
     private var NftViewsHashMap = HashMap.fromIter<Text, Nat>(
         Iter.fromArray(NftViews),
@@ -54,8 +53,39 @@ actor class () = this {
         Text.hash,
     );
 
+    //track the locked nfts to be purchased
+    private stable var NftLockArray : [(Text, Bool)] = [];
+    private var NftLockHashMap = HashMap.fromIter<Text, Bool>(
+        Iter.fromArray(NftLockArray),
+        Iter.size(Iter.fromArray(NftLockArray)),
+        Text.equal,
+        Text.hash,
+    );
 
-//save the nft views
+    // Function to check if an NFT is locked
+    func is_nft_locked(nft_id : Text) : async Bool {
+        switch (NftLockHashMap.get(nft_id)) {
+            case (?locked) return locked;
+            case (null) return false;
+        };
+    };
+
+    // Function to lock an NFT
+    func lock_nft(nft_id : Text) : async Bool {
+        if (await is_nft_locked(nft_id)) {
+            return false;
+        } else {
+            NftLockHashMap.put(nft_id, true);
+            return true;
+        };
+    };
+
+    // Function to unlock an NFT
+    func unlock_nft(nft_id : Text) : async () {
+        NftLockHashMap.put(nft_id, false);
+    };
+
+    //save the nft views
     public func save_nft_view(nft_id : Text) : async Text {
         switch (NftViewsHashMap.get(nft_id)) {
             case (?data) {
@@ -90,7 +120,6 @@ actor class () = this {
         };
     };
 
-
     //get all the nft views in the marketplace
     public query func get_all_nft_views() : async Response<[(Text, Nat)]> {
         let data = Iter.toArray<(Text, Nat)>(NftViewsHashMap.entries());
@@ -101,8 +130,6 @@ actor class () = this {
             error_text = null;
         };
     };
-
-
 
     //get all transactions from the marketplace
     public query func salesTransactions() : async Response<[[SaleTransaction]]> {
@@ -115,18 +142,8 @@ actor class () = this {
         };
     };
 
-    //get transaction history for a specific nft
+    // //get transaction history for a specific nft
     public query func get_nft_sale_history(tokenId : Text) : async Response<[SaleTransaction]> {
-
-        // let tempBuff = Buffer.Buffer<SaleTransaction>(0);
-        // for ((_, nft) in TransactionsHashMap.entries()) {
-        //     if (nft.token == tokenId) {
-        //         tempBuff.add(nft);
-        //     };
-        // };
-
-        // let dat = TransactionsHashMap.get(tokenId);
-
         return {
             status = 200;
             status_text = "Ok";
@@ -451,10 +468,8 @@ actor class () = this {
     //buy the nft directly from the marketplace
     public shared ({ caller }) func buy_nft(nft_id : Text) : async Response<Text> {
         //check if the nft is available
-
         switch (NftListingHashMap.get(nft_id)) {
             case (null) {
-
                 return {
                     status = 200;
                     status_text = "error";
@@ -474,8 +489,8 @@ actor class () = this {
                     };
 
                 };
-                //check the allowance of the marketplace from the callers account
 
+                //check the allowance of the marketplace from the callers account
                 let allowanceResults = await icp_token_canister.icrc2_allowance({
                     account = {
                         owner = caller;
@@ -489,15 +504,24 @@ actor class () = this {
 
                 //check if the allowance is enough
                 if (allowanceResults.allowance < data.nft_price + 10000) {
-                    return
-
-                    {
+                    return {
                         status = 200;
                         status_text = "error";
                         data = null;
                         error_text = ?"allowance less than amount";
                     };
 
+                };
+
+                //finally lock the nft to prevent race conditions
+                let rrs = await lock_nft(nft_id);
+                if (not rrs) {
+                    return {
+                        status = 400;
+                        status_text = "Error";
+                        data = null;
+                        error_text = ?("NFT is currently locked. Please try again later.");
+                    };
                 };
 
                 //transfer the amount to the canister itself
@@ -574,6 +598,10 @@ actor class () = this {
                                     };
                                     //remove th nft from the marketplace
                                     ignore NftListingHashMap.remove(nft_id);
+
+                                    //unlock the nft before returning
+                                    await unlock_nft(nft_id);
+
                                     return {
                                         status = 200;
                                         status_text = "Ok";
@@ -582,6 +610,9 @@ actor class () = this {
                                     };
 
                                 } else {
+                                    //unlock the nft before returning
+                                    await unlock_nft(nft_id);
+
                                     return {
                                         status = 200;
                                         status_text = "error";
@@ -597,6 +628,9 @@ actor class () = this {
                                 let res = await transferICP(caller, data.nft_price -10000);
                                 if (res == true) {
 
+                                    //unlock the nft before returning
+                                    await unlock_nft(nft_id);
+
                                     return {
                                         status = 200;
                                         status_text = "error";
@@ -605,6 +639,9 @@ actor class () = this {
                                     };
 
                                 } else {
+
+                                    //unlock the nft before returning
+                                    await unlock_nft(nft_id);
 
                                     return {
                                         status = 200;
@@ -619,9 +656,11 @@ actor class () = this {
 
                     };
                     case (_) {
-                        return
 
-                        {
+                        //unlock the nft before returning
+                        await unlock_nft(nft_id);
+
+                        return {
                             status = 200;
                             status_text = "error";
                             data = null;
@@ -872,6 +911,17 @@ actor class () = this {
                     };
                 };
 
+                //lock the nft to prevent race conditions
+                let rrs = await lock_nft(nft_id);
+                if (not rrs) {
+                    return {
+                        status = 400;
+                        status_text = "Error";
+                        data = null;
+                        error_text = ?("NFT is currently locked. Please try again later.");
+                    };
+                };
+
                 //transfer the icp to the marketplace
                 let transferResults = await transferFromICP(offer.user, offer.amount);
                 if (transferResults == true) {
@@ -908,6 +958,9 @@ actor class () = this {
                             //remove the nft from the marketplace listing
                             ignore NftListingHashMap.remove(nft_id);
 
+                            // Unlock the NFT after the process is completed
+                            await unlock_nft(nft_id);
+
                             return {
                                 status = 200;
                                 status_text = "Ok";
@@ -916,6 +969,8 @@ actor class () = this {
                             };
 
                         } else {
+                            // Unlock the NFT after the process is completed
+                            await unlock_nft(nft_id);
 
                             //save data to enable claim
                             return {
@@ -931,6 +986,10 @@ actor class () = this {
                         //refund the user their icp
                         let res = await transferICP(offer.user, offer.amount -10000);
                         if (res == true) {
+
+                            // Unlock the NFT after the process is completed
+                            await unlock_nft(nft_id);
+
                             //save data to cofirm transaction
                             return {
                                 status = 200;
@@ -940,6 +999,10 @@ actor class () = this {
                             };
 
                         } else {
+
+                            // Unlock the NFT after the process is completed
+                            await unlock_nft(nft_id);
+
                             //save data to enable claim
                             return {
                                 status = 200;
@@ -951,6 +1014,10 @@ actor class () = this {
                     };
 
                 } else {
+
+                    // Unlock the NFT after the process is completed
+                    await unlock_nft(nft_id);
+
                     return {
                         status = 200;
                         status_text = "error";
@@ -1032,18 +1099,18 @@ actor class () = this {
         NftListings := Iter.toArray(NftListingHashMap.entries());
         SaleTransaction := Iter.toArray(TransactionsHashMap.entries());
         NftViews := Iter.toArray(NftViewsHashMap.entries());
+        //add the nft lock stuff
+        NftLockArray := Iter.toArray(NftLockHashMap.entries());
     };
 
     system func postupgrade() {
         NftListings := [];
         SaleTransaction := [];
         NftViews := [];
+        NftLockArray := [];
     };
 
 };
-
-
-
 
 // [dependencies]
 // base = "0.11.2"

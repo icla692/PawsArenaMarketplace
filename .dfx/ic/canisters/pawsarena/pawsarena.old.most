@@ -29,6 +29,8 @@ actor {
   stable var KITTIES_CANISTER_ID : Text;
   stable var MARKEPTLACE_ACCOUNT_IDENTIFIER : Text;
   stable var NftListings : [(Text, ListNFTData)];
+  stable var NftLockArray : [(Text, Bool)];
+  stable var NftViews : [(Text, Nat)];
   stable var SaleTransaction : [(Text, [SaleTransaction__3])];
   stable var nftOfferCount : Nat32
 };

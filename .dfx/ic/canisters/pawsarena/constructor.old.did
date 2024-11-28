@@ -6,7 +6,17 @@ type SaleTransaction =
    time: int;
    token: text;
  };
-type Response_5 = 
+type Response_7 = 
+ record {
+   data: opt vec record {
+                   text;
+                   nat;
+                 };
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response_6 = 
  record {
    data: opt vec record {
                    text;
@@ -16,23 +26,30 @@ type Response_5 =
    status: nat16;
    status_text: text;
  };
-type Response_4 = 
+type Response_5 = 
  record {
    data: opt vec ListedNFTData;
    error_text: opt text;
    status: nat16;
    status_text: text;
  };
-type Response_3 = 
+type Response_4 = 
  record {
    data: opt ListedNFTData;
    error_text: opt text;
    status: nat16;
    status_text: text;
  };
-type Response_2 = 
+type Response_3 = 
  record {
    data: opt vec SaleTransaction;
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response_2 = 
+ record {
+   data: opt nat;
    error_text: opt text;
    status: nat16;
    status_text: text;
@@ -79,14 +96,17 @@ service : {
   cancel_offer: (nat32, text) -> (Response);
   claim_nft: (text) -> (text);
   complete_listing: (principal, nat, NFT_CATEGORY) -> (Response);
-  get_all_listed_nfts: () -> (Response_5) query;
-  get_all_test: () -> (Response_5) query;
-  get_all_user_listed_nfts: (principal) -> (Response_4) query;
-  get_listed_nft_details: (text) -> (Response_3) query;
-  get_nft_sale_history: (text) -> (Response_2) query;
+  get_all_listed_nfts: () -> (Response_6) query;
+  get_all_nft_views: () -> (Response_7) query;
+  get_all_test: () -> (Response_6) query;
+  get_all_user_listed_nfts: (principal) -> (Response_5) query;
+  get_listed_nft_details: (text) -> (Response_4) query;
+  get_nft_sale_history: (text) -> (Response_3) query;
+  get_nft_views: (text) -> (Response_2) query;
   init_list_nft: (principal, nat, NFT_CATEGORY, nat) -> (Response);
   place_offer_on_nft: (text, nat, int) -> (Response);
   salesTransactions: () -> (Response_1) query;
+  save_nft_view: (text) -> (text);
   transferNftMarketplace: (principal, text, NFT_CATEGORY) -> (bool);
   un_list_nft: (text) -> (Response);
   update_nft_price: (text, nat) -> (Response);

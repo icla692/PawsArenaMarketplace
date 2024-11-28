@@ -160,7 +160,7 @@ const CollectionDetails = () => {
 
   // Pagination functions
   const nextPage = () => {
-    console.log("current page :", currentPage,totalPages);
+    console.log("current page :", currentPage, totalPages);
     if (currentPage < totalPages - 1) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
@@ -195,7 +195,6 @@ const CollectionDetails = () => {
     let filteredProducts = listedNfts?.length > 0 ? [...listedNfts] : []; // Start with a copy of listedNfts
 
     // Filter based on searchQuery
-    
 
     // Apply the listedFilter
     if (listedFilter === "listed") {
@@ -208,12 +207,11 @@ const CollectionDetails = () => {
       console.log("all tokens :", myTokens);
     }
 
-
     if (searchQuery) {
-        filteredProducts = filteredProducts?.filter((nft) =>
-          nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      } 
+      filteredProducts = filteredProducts?.filter((nft) =>
+        nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
     // Apply price filtering if minPrice or maxPrice is set
     if (minPrice) {
       filteredProducts = filteredProducts?.filter(
@@ -240,11 +238,11 @@ const CollectionDetails = () => {
     if (selectedOptions.length > 0) {
         const filteredByTraits = Object.keys(genes).filter((key) => {
           const traits = genes[key];
-          return selectedOptions.some(option => traits.includes(option));
+          return selectedOptions.every((option) => traits.includes(option));
         });
-
+      
         console.log("filteredByTraits", filteredByTraits);
-  
+      
         filteredProducts = filteredProducts?.filter((nft) =>
           filteredByTraits.includes(nft[0].toString())
         );
@@ -268,11 +266,11 @@ const CollectionDetails = () => {
     minPrice,
     maxPrice,
     currentPage,
-    selectedOptions
+    selectedOptions,
   ]);
   // Calculate total pages based on all tokens
   const totalPages = Math.ceil(myTokens?.length / itemsPerPage);
-console.log("total pages :", totalPages);
+  console.log("total pages :", totalPages);
   return (
     <>
       <div className="flex flex-col mx-4 min-h-screen md:mx-20 mt-[10px]">
@@ -294,17 +292,15 @@ console.log("total pages :", totalPages);
           handleSearchChange={handleSearchChange}
           handleSortPriceChange={handleSortPriceChange}
           handlelistedChange={handlelistedChange}
-
           traitsData={traitsData}
-                  handleOptionClick={handleOptionClick}
-                  handleSectionClick={handleSectionClick}
-                  expandedSections={expandedSections}
-                  selectedOptions={selectedOptions}
-                  setExpandedSections={setExpandedSections}
-                  setSelectedOptions={setSelectedOptions}
-
-
+          handleOptionClick={handleOptionClick}
+          handleSectionClick={handleSectionClick}
+          expandedSections={expandedSections}
+          selectedOptions={selectedOptions}
+          setExpandedSections={setExpandedSections}
+          setSelectedOptions={setSelectedOptions}
         />
+
         <ListedNFTs
           results={finalFilteredData}
           isLoading={dataLoading}

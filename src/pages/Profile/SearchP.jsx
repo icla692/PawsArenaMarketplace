@@ -23,18 +23,18 @@ const SearchP = ({selectedTab,handleTabClick}) => {
         >
           Selling
         </div>
-        <div
+        {/* <div
           className={tabStyle("Offers")}
           onClick={() => handleTabClick("Offers")}
         >
           Offers
-        </div>
-        <div
+        </div> */}
+        {/* <div
           className={tabStyle("Activity")}
           onClick={() => handleTabClick("Activity")}
         >
           Activity
-        </div>
+        </div> */}
       </div>
     </div>
   );

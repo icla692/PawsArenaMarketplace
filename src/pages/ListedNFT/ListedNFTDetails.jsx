@@ -119,6 +119,7 @@ const ListedNFTDetails = () => {
     saveView();
   }, [nftID]);
 
+  // console.log("nft info :", nftTraits);
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -222,7 +223,7 @@ const ListedNFTDetails = () => {
                       className="flex flex-col p-1 w-full md:w-1/2 lg:w-1/3"
                     >
                       <span className="font-bold">{trait[0]}</span>
-                      <span>{trait[1]}</span>
+                      <span>{trait[1].color}</span>
                     </div>
                   ))
                 ) : (
@@ -233,6 +234,14 @@ const ListedNFTDetails = () => {
           </div>
           <div className="flex  justify flex-col w-full md:w-1/2 ">
             <div className="flex flex-col gap-3">
+              <div className="flex">
+                <button
+                  className="flex border rounded-md px-2 "
+                  onClick={() => navigate("/collection/" + colID)}
+                >
+                  Back
+                </button>
+              </div>
               <h1 className="text-[30px] font-bold">
                 {nftDetails && "ICKitties"} # {nftID}
               </h1>

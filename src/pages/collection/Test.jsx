@@ -43,9 +43,20 @@ const FilterSection = ({
                           handleOptionClick(traitData.trait, color, id)
                         }
                       />
-                      <label htmlFor={id} className="ml-2">
-                        {color}
-                      </label>
+                     
+ 
+                      <div className="flex flex-row w-full text-sm my-2 items-center justify-between">
+                        <span>
+                        {color.color}
+
+
+                        </span>
+                        <span className="border px-1 rounded-full text-sm">
+                        {color.count}
+                        </span>
+
+
+                      </div>
                     </div>
                   );
                 })}

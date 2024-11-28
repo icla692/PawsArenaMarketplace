@@ -48,7 +48,11 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
         authenticatedAgent
       );
 
-      const IcpActor = createActor(MY_LEDGER_CANISTER_ID, ICPDL, authenticatedAgent);
+      const IcpActor = createActor(
+        MY_LEDGER_CANISTER_ID,
+        ICPDL,
+        authenticatedAgent
+      );
 
       //apprive the marketplace to get the funds before placing an order
       let approveResults = await IcpActor.icrc2_approve({
@@ -65,15 +69,14 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
         },
       });
 
-      console.log("apprive results :",approveResults);
-      
+      console.log("apprive results :", approveResults);
 
       let _days = getUnixTimestampInNanoseconds(expiryDate);
 
       let res = await marketplaceActor?.place_offer_on_nft(
         nftid,
         Number(offerAmount * 1e8),
-        _days,
+        _days
       );
 
       if (res.status == 200 && res.status_text == "Ok") {
@@ -87,7 +90,6 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
     } catch (error) {
       console.log("error in placing offer :", error);
     }
-
   };
 
   const { mutateAsync: HandleMakeOffer } = useMutation({
@@ -126,9 +128,9 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
             </div>
 
             <form onSubmit={HandleMakeOffer}>
-              <label className="block mb-2" htmlFor="price">
+              {/* <label className="block mb-2" htmlFor="price">
                 Enter Offer amount
-              </label>
+              </label> */}
               <input
                 type="number"
                 id="price"
@@ -163,10 +165,6 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
           </div>
         </div>
       )}
-
-
-
-      
     </div>
   );
 };
