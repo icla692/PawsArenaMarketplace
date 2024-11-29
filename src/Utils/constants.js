@@ -67,7 +67,7 @@ export const traitsData = [
     ],
   },
   {
-    trait: "Fur",
+    trait: "Kitty Color",
     colors: [
       { color: "Gray", count: 1723 },
       { color: "Green", count: 1614 },
@@ -143,7 +143,7 @@ export const traitsData = [
     ],
   },
   {
-    trait: "Kitty Color",
+    trait: "Body",
     colors: [
       { color: "Sprinkles", count: 334 },
       { color: "Red sports Tshirt", count: 569 },
@@ -247,7 +247,7 @@ export const traitsData = [
       { color: "Clown Nose", count: 832 },
       { color: "Cigarette", count: 455 },
       { color: "Vape", count: 73 },
-      { color: "God tongue", count: 7 },
+      // { color: "God tongue", count: 7 },
       { color: "Nothing", count: 4553 },
     ],
   },
@@ -316,7 +316,7 @@ export const traitsData = [
       { color: "Robin Meow Hat", count: 94 },
       { color: "Red Beanie", count: 684 },
       { color: "Bandana", count: 351 },
-      { color: "Nothing", count: 1397 },
+      // { color: "Nothing", count: 1397 },
       { color: "King Crown", count: 7 },
       { color: "Queen Crown", count: 7 },
     ],
