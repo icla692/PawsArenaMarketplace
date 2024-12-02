@@ -38,7 +38,7 @@ const FilterSection = ({
                       <input
                         type="checkbox"
                         id={id}
-                        checked={selectedOptions.includes(id)}
+                        checked={selectedOptions[traitData.trait]?.includes(id)}
                         onChange={() =>
                           handleOptionClick(traitData.trait, color, id)
                         }

@@ -32,23 +32,35 @@ const CollectionDetails = () => {
 
   //sort the nft according to the nft traits
   const [expandedSections, setExpandedSections] = useState({});
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
+  const [selectedOptions, setSelectedOptions] = useState({});
+  
   const handleSectionClick = (trait) => {
     setExpandedSections((prev) => ({
       ...prev,
       [trait]: !prev[trait],
     }));
   };
-
+  
   const handleOptionClick = (trait, color, id) => {
     setSelectedOptions((prev) => {
-      const newOptions = prev.includes(id)
-        ? prev.filter((option) => option !== id)
-        : [...prev, id];
+      const newOptions = { ...prev };
+      if (newOptions[trait]) {
+        if (newOptions[trait].includes(id)) {
+          newOptions[trait] = newOptions[trait].filter((option) => option !== id);
+          if (newOptions[trait].length === 0) {
+            delete newOptions[trait];
+          }
+        } else {
+          newOptions[trait].push(id);
+        }
+      } else {
+        newOptions[trait] = [id];
+      }
       return newOptions;
     });
   };
+
+  console.log("Selected Options:", selectedOptions);
 
   const itemsPerPage = 50;
   // const [listedNfts, setListedNfts] = useState([]);
@@ -235,17 +247,18 @@ const CollectionDetails = () => {
     }
 
     // Filter based on selectedOptions
-    if (selectedOptions.length > 0) {
-      
-        const filteredByTraits = Object.keys(genes).filter((key) => {
-          const traits = genes[key];
-          return selectedOptions.every((option) => traits.includes(option));
-        });
-      
-        filteredProducts = filteredProducts?.filter((nft) =>
-          filteredByTraits.includes(nft[0].toString())
+    if (Object.keys(selectedOptions).length > 0) {
+      const filteredByTraits = Object.keys(genes).filter((key) => {
+        const traits = genes[key];
+        return Object.keys(selectedOptions).every((trait) =>
+          selectedOptions[trait].some((option) => traits.includes(option))
         );
-      }
+      });
+
+      filteredProducts = filteredProducts?.filter((nft) =>
+        filteredByTraits.includes(nft[0].toString())
+      );
+    }
 
     // Pagination: slice the array for current page
     const startIndex = currentPage * itemsPerPage;
