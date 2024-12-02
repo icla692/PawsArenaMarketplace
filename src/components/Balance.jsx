@@ -224,7 +224,7 @@ const InputSection = ({
         type="text"
         id="recipient"
         value={recipient}
-        placeholder="Enter principal"
+        placeholder="Enter principal address or account identifier"
         onChange={(e) => onRecipientChange(e.target.value)}
         className="border border-white text-black rounded p-1 w-full mb-4"
         required

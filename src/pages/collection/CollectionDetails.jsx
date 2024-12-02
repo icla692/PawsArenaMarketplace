@@ -236,12 +236,11 @@ const CollectionDetails = () => {
 
     // Filter based on selectedOptions
     if (selectedOptions.length > 0) {
+      
         const filteredByTraits = Object.keys(genes).filter((key) => {
           const traits = genes[key];
           return selectedOptions.every((option) => traits.includes(option));
         });
-      
-        console.log("filteredByTraits", filteredByTraits);
       
         filteredProducts = filteredProducts?.filter((nft) =>
           filteredByTraits.includes(nft[0].toString())
