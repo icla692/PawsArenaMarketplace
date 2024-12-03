@@ -159,7 +159,7 @@ const Profile = () => {
 
   ///sort the displayed NFTs
 
-  const [selectedTab, setSelectedTab] = useState("Collected");
+  const [selectedTab, setSelectedTab] = useState("");
   const [selectedCollection, setSelectedCollection] = useState(
     "rw7qm-eiaaa-aaaak-aaiqq-cai"
   );

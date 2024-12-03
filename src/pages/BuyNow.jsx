@@ -91,7 +91,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     } catch (error) {
       console.log("error in buying nft :", error);
     }
-    navigate("/profile");
+    // navigate("/profile");
   };
 
   return (

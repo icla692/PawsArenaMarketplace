@@ -59,6 +59,9 @@ const Searchbar = ({
               Price Low to High
             </option>
             <option value="hightolow">Price High to Low</option>
+            <option value="rarityindexasc">NFT Rarity Index(Asc)</option>
+            <option value="rarityindexdesc">NFT Rarity Index(Desc)</option>
+
           </select>
           {/* {
             pages && pages?.map((page)=>(
@@ -80,11 +83,11 @@ const Searchbar = ({
               value="listed"
               title="Listed"
             />
-            <Button
+            {/* <Button
               onClickHandler={handlelistedChange}
-              value="hasoffers"
-              title="Has Offers"
-            />
+              value="reset"
+              title="Reset"
+            /> */}
           </div>
           <div className="flex gap-4 items-center justify-center mt-4">
             <button
@@ -178,6 +181,7 @@ const Searchbar = ({
             >
               <option value="lowtohigh">Price Low to High</option>
               <option value="hightolow">Price High to Low</option>
+              <option value="rarityindex">NFT Rarity Index</option>
             </select>
 
             {/* Price Filter in Modal */}

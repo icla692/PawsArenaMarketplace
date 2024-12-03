@@ -12,7 +12,7 @@ import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { traitsData } from "../../Utils/constants";
 import genes from "../../genes";
-
+import Rarity from "../../rarity.json";
 const HOST =
   process.env.DFX_NETWORK !== "ic"
     ? "https://ic0.app"
@@ -24,7 +24,7 @@ const CollectionDetails = () => {
   const [collectionData, setCollectionData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortPrice, setSortPrice] = useState("lowtohigh");
-  const [listedFilter, setListedFilter] = useState("listed");
+  const [listedFilter, setListedFilter] = useState("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +92,6 @@ const CollectionDetails = () => {
     queryKey: ["collectionDetails"],
   });
 
-  console.log("genes :", genes);
   useEffect(() => {
     const fetchNFTDetails = async () => {
       // if (!collectionID) return;
@@ -206,7 +205,34 @@ const CollectionDetails = () => {
   const finalFilteredData = useMemo(() => {
     let filteredProducts = listedNfts?.length > 0 ? [...listedNfts] : []; // Start with a copy of listedNfts
 
-    // Filter based on searchQuery
+
+
+    // Apply sorting based on sortPrice
+    if (sortPrice) {
+      if (sortPrice === "rarityindexasc") {
+        filteredProducts = myTokens?.sort((a, b) => {
+          const rarityA = Rarity[a[0]];
+          const rarityB = Rarity[b[0]];
+          return rarityA - rarityB;
+        });
+      } 
+      else if(sortPrice === "rarityindexdesc"){
+        filteredProducts = myTokens?.sort((a, b) => {
+          const rarityA = Rarity[a[0]];
+          const rarityB = Rarity[b[0]];
+          return rarityB - rarityA;
+        });
+      }
+      else  {
+        filteredProducts?.sort((a, b) =>
+          sortPrice === "lowtohigh"
+            ? Number(a[1]?.price || 0) - Number(b[1]?.price || 0)
+            : Number(b[1]?.price || 0) - Number(a[1]?.price || 0)
+        );
+      }
+    }
+
+
 
     // Apply the listedFilter
     if (listedFilter === "listed") {
@@ -221,7 +247,7 @@ const CollectionDetails = () => {
 
     if (searchQuery) {
       filteredProducts = filteredProducts?.filter((nft) =>
-        nft[0]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        (nft[0] +1)?.toString().toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     // Apply price filtering if minPrice or maxPrice is set
@@ -237,14 +263,6 @@ const CollectionDetails = () => {
       );
     }
 
-    // Apply sorting based on sortPrice
-    if (sortPrice) {
-      filteredProducts?.sort((a, b) =>
-        sortPrice === "lowtohigh"
-          ? Number(a[1].price) - Number(b[1].price)
-          : Number(b[1].price) - Number(a[1].price)
-      );
-    }
 
     // Filter based on selectedOptions
     if (Object.keys(selectedOptions).length > 0) {

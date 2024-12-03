@@ -1,10 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { MARKETPLACE_CANISTER } from "../../Utils/constants";
+import { MARKETPLACE_CANISTER, MY_LEDGER_CANISTER_ID } from "../../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../../Utils/useFecth";
-import { useAgent } from "@nfid/identitykit/react";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
+import { idlFactory as ICPDL } from "../../Utils/icptoken.did";
+import { createActor } from "../../Utils/createActor";
+
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,51 +26,37 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     setTimeout(() => setShowModal(false), 3000);
   };
 
-  const { data: userPrincipal } = useQuery({
-    queryKey: ["userPrincipal"],
-  });
 
-  const { data: userIcpBalance } = useQuery({
-    queryKey: ["userIcpBalance"],
-  });
+  const {user} = useIdentityKit()
 
-  const { data: allListings } = useQuery({
-    queryKey: ["allListings"],
-  });
-
-  const { data: userNFTS } = useQuery({
-    queryKey: ["userNFTS"],
-  });
 
   const { data: nftActor } = useQuery({
     queryKey: ["nftActor"],
   });
 
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
-  const { data: IcpActor } = useQuery({
-    queryKey: ["IcpActor"],
-  });
-
-  const { mutateAsync: HandleBuy } = useMutation({
-    mutationFn: () => handleBuy(),
-    onSuccess: async () => {
-      invalidateListings();
-      invalidateUserNfts();
-      invalidateUserBalance();
-      setIsLoading(false);
-    },
-  });
-
+  
+  
   const handleBuy = async () => {
+    console.log("buying nft", nftid, nft_price, userP);
     try {
-      if (!marketplaceActor) {
+      if (!user || !authenticatedAgent) {
         displayNotificationModal("Log in first to purchase this NFT", "error");
         return;
       }
-      // if (!window.confirm("buy this nft?")) return;
+
+      let marketplaceActor = createActor(
+        MARKETPLACE_CANISTER,
+        marketIDL,
+        authenticatedAgent
+      );
+
+      const IcpActor = createActor(
+        MY_LEDGER_CANISTER_ID,
+        ICPDL,
+        authenticatedAgent
+      );
+
+
 
       setIsLoading(true);
       //approve the marketplace to transfer funds on the user/s behalf
@@ -99,6 +89,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
     }
   };
 
+  //8edb53debf13d254295dbcbf1a888b0723a7f853a181e91e9518ec871fb934a6
   return (
     <>
       {showModal && (
@@ -116,7 +107,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
       )}
 
       <button
-        onClick={() => HandleBuy()}
+        onClick={() => handleBuy()}
         className="flex bg-[#2E8DEE] w-full rounded-b-lg mt-4 font-bold text-white justify-center items-center p-2"
         //  disabled={nft_price != undefined && userP == userPrincipal}
       >

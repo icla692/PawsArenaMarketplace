@@ -10,7 +10,6 @@ const FilterSection = ({
   expandedSections,
   selectedOptions,
 }) => {
-  
   console.log("Selected Options:", selectedOptions);
 
   return (
@@ -43,19 +42,12 @@ const FilterSection = ({
                           handleOptionClick(traitData.trait, color, id)
                         }
                       />
-                     
- 
+
                       <div className="flex flex-row w-full text-sm my-2 items-center justify-between">
-                        <span>
-                        {color.color}
-
-
-                        </span>
+                        <span>{color.color}</span>
                         <span className="border px-1 rounded-full text-sm">
-                        {color.count}
+                          {color.count}
                         </span>
-
-
                       </div>
                     </div>
                   );
