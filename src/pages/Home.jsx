@@ -107,19 +107,16 @@ const Home = () => {
     fetchDetails();
   }, [user, refreshData]);
 
-  const replacer = (key, value) =>
-    typeof value === "bigint" ? value.toString() : value;
-
   useEffect(() => {
     const loadData = async () => {
       let bulkDataArray = [];
       let collectionDetailsArray = [];
 
-      // if (bulkData && collectionDetails) {
-      //   console.log("Data already present");
+      // if (refreshData !== "doit") {
+      //   console.log("yeah lets do it");
       //   return;
       // }
-
+      console.log("refetching nfts please wait");
       setIsLoading(true);
 
       try {

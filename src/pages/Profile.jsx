@@ -18,8 +18,9 @@ import SearchP from "./Profile/SearchP";
 import NftDisplay from "./Profile/DisplayNFTs";
 import ActivityTable from "./Profile/ActivityTable";
 import { BsCopy } from "react-icons/bs";
-import { copyToClipboard } from "../Utils/constants";
+import { copyToClipboard, shortenAddress } from "../Utils/constants";
 import Balance from "../components/Balance";
+import { IoIosArrowBack } from "react-icons/io";
 
 const style = {
   wrapper: `flex mt-[80px] min-h-screen bg-[#121212] flex-col w-full items-center px-[1.2rem] md:px-[4.2rem] py-4 text-white`,
@@ -148,14 +149,9 @@ const Profile = () => {
 
   const handleTrigger = (e) => setTrigger(Math.random());
 
-  const handleCopyAddress = (userAddress) => {
-    navigator.clipboard.writeText(userAddress);
-    alert("Address copied to clipboard!");
-  };
-
-  const shortenAddress = (address, nom) => {
-    return `${address.slice(0, nom)}...${address.slice(-7)}`;
-  };
+  // const shortenAddress = (address, nom) => {
+  //   return `${address.slice(0, nom)}...${address.slice(-7)}`;
+  // };
 
   ///sort the displayed NFTs
 
@@ -222,7 +218,7 @@ const Profile = () => {
               <div className={style.collectionName}>{nft.collectionName}</div>
             </div>
             <div className={style.infoRight}>
-              <div className={style.assetName}>#{nft.nftid} </div>
+              <div className={style.assetName}>#{Number(nft.nftid) + 1} </div>
             </div>
           </div>
           <div className={style.buttonsContainer}>
@@ -286,6 +282,15 @@ const Profile = () => {
     <>
       {user?.principal ? (
         <div className={style.wrapper}>
+          <div className="flex w-full">
+            <button
+              className="flex mb-1 border items-center rounded-md px-2 "
+              onClick={() => navigate("/")}
+            >
+              <IoIosArrowBack />
+              Back to Collections
+            </button>
+          </div>
           <div className={style.profileSection}>
             <div className="flex rounded-t-md text-black font-bold px-4 bg-white">
               Overview

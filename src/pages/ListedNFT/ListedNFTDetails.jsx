@@ -54,6 +54,10 @@ const ListedNFTDetails = () => {
     queryKey: ["marketplaceActor"],
   });
 
+  const { data: refreshData } = useQuery({
+    queryKey: ["refreshData"],
+  });
+
   const { data: myTokens, isLoading: dataLoading } = useQuery({
     queryKey: ["myTokens"],
   });
@@ -186,7 +190,6 @@ const ListedNFTDetails = () => {
       } catch (error) {
         console.log("error in fetching details :", error);
       }
-
       setContentLoading(false);
     };
 
@@ -243,7 +246,7 @@ const ListedNFTDetails = () => {
                 </button>
               </div>
               <h1 className="text-[30px] font-bold">
-                {nftDetails && "ICKitties"} # {nftID}
+                {nftDetails && "ICKitties"} # {Number(nftID)+1}
               </h1>
 
               <div className="flex items-center gap-2">
@@ -276,7 +279,7 @@ const ListedNFTDetails = () => {
 
                       <span className="flex text-lg">
                         {nftDetails &&
-                          (Number(nftDetails?.nft_price) / 1e8).toFixed(2)}
+                          (Number(nftDetails?.nft_price) / 1e8).toFixed(3)}
                       </span>
                     </div>
                     {user &&

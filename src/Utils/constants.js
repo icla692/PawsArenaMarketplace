@@ -36,6 +36,13 @@ export const shortenAddress = (address) => {
   return `${address.slice(0, 10)}...${address.slice(-5)}`;
 };
 
+
+export  const convertExpiryDate = (expiry) => {
+  const date = new Date(Number(expiry) / 1e6);
+  return date.toLocaleString(); // Adjust options as needed for formatting
+};
+
+
 export const traitsData = [
   {
     trait: "Background",

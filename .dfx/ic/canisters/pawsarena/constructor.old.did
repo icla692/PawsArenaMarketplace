@@ -1,113 +1,50 @@
-type SaleTransaction = 
- record {
-   buyer: principal;
-   price: nat64;
-   seller: principal;
-   time: int;
-   token: text;
- };
-type Response_7 = 
- record {
-   data: opt vec record {
-                   text;
-                   nat;
-                 };
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_6 = 
- record {
-   data: opt vec record {
-                   text;
-                   ListedNFTData;
-                 };
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_5 = 
- record {
-   data: opt vec ListedNFTData;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_4 = 
- record {
-   data: opt ListedNFTData;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_3 = 
- record {
-   data: opt vec SaleTransaction;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_2 = 
- record {
-   data: opt nat;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response_1 = 
- record {
-   data: opt vec vec SaleTransaction;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type Response = 
- record {
-   data: opt text;
-   error_text: opt text;
-   status: nat16;
-   status_text: text;
- };
-type OfferData = 
- record {
-   amount: nat;
-   expiry_date: int;
-   offer_id: nat32;
-   user: principal;
- };
-type NFT_CATEGORY__1 = variant {Kitties;};
-type NFT_CATEGORY = variant {Kitties;};
-type ListedNFTData = 
- record {
-   date_of_listing: int;
-   isConfirmed: bool;
-   nft_canister: text;
-   nft_category: NFT_CATEGORY__1;
-   nft_id: nat32;
-   nft_price: nat;
-   offers: vec OfferData;
-   seller_identifier: text;
-   seller_principal: principal;
-   token_identifier: text;
- };
+type AssetType = variant {
+  other : text;
+  canister : CanisterAssetType;
+  direct : vec nat32;
+};
+type CanisterAssetType = record { id : nat32; canister : text };
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  status_code : nat16;
+};
+type Icrc28TrustedOriginsResponse = record { trusted_origins : vec text };
+type MintResponse = variant { Ok : vec nat32; Err : text };
+type NFTType = variant {
+  ListedProfile : nat32;
+  AuctionedPost : nat32;
+  Posted : nat32;
+  ListedPost : nat32;
+  AuctionedProfile : nat32;
+  Unposted : nat32;
+};
+type Result = variant { Ok; Err : text };
 service : {
-  accept_offer: (text, nat32) -> (Response);
-  buy_nft: (text) -> (Response);
-  cancel_offer: (nat32, text) -> (Response);
-  claim_nft: (text) -> (text);
-  complete_listing: (principal, nat, NFT_CATEGORY) -> (Response);
-  get_all_listed_nfts: () -> (Response_6) query;
-  get_all_nft_views: () -> (Response_7) query;
-  get_all_test: () -> (Response_6) query;
-  get_all_user_listed_nfts: (principal) -> (Response_5) query;
-  get_listed_nft_details: (text) -> (Response_4) query;
-  get_nft_sale_history: (text) -> (Response_3) query;
-  get_nft_views: (text) -> (Response_2) query;
-  init_list_nft: (principal, nat, NFT_CATEGORY, nat) -> (Response);
-  place_offer_on_nft: (text, nat, int) -> (Response);
-  salesTransactions: () -> (Response_1) query;
-  save_nft_view: (text) -> (text);
-  transferNftMarketplace: (principal, text, NFT_CATEGORY) -> (bool);
-  un_list_nft: (text) -> (Response);
-  update_nft_price: (text, nat) -> (Response);
+  add_admin : (principal) -> ();
+  add_asset : (text, text, text, AssetType, nat) -> ();
+  auction_profile_nft_on_marketplace : (nat32, nat32, nat32, nat64) -> (Result);
+  available_balance : () -> (nat) query;
+  execute_mint : (text, text) -> (MintResponse);
+  generate_user_feed : (nat32) -> (
+      vec record { nat32; vec nat32 },
+    ) composite_query;
+  get_admins : () -> (vec principal) query;
+  get_trusted_origins : () -> (vec text);
+  get_user_nfts : (text, nat32) -> (vec NFTType) composite_query;
+  get_user_profile_nft : (text, principal) -> (vec nat32);
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  icrc28_trusted_origins : () -> (Icrc28TrustedOriginsResponse);
+  is_caller_admin : () -> (Result) query;
+  is_handle_available : (text) -> (bool) query;
+  list_profile_nft_on_marketplace : (nat32, nat32, nat32) -> (Result);
+  remove_admin : (principal) -> ();
+  stream_asset : (text, blob, bool) -> (bool);
+  whoami : () -> (text) query;
 }

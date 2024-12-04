@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import {
   MARKETPLACE_CANISTER,
@@ -22,45 +22,46 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =
     useFecth();
 
-  const authenticatedAgent = useAgent();
+  const authenticatedAgent = useAgent({ retryTimes: 3 });
   const { user } = useIdentityKit();
 
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);
     setModalType(_type);
     setShowModal(true);
-    setTimeout(() => setShowModal(false), 3000);
+    // setTimeout(() => setShowModal(false), 3000);
   };
 
   const navigate = useNavigate();
-  const { mutateAsync: HandleBuy } = useMutation({
-    mutationFn: () => handleBuy(),
-    onSuccess: async () => {
-      invalidateListings();
-      invalidateUserNfts();
-      invalidateUserBalance();
-      setIsLoading(false);
-    },
-  });
+  const queryClient = useQueryClient();
+
+  // const { mutateAsync: HandleBuy } = useMutation({
+  //   mutationFn: () => handleBuy(),
+  //   onSuccess: async () => {
+  //     invalidateListings();
+  //     invalidateUserNfts();
+  //     invalidateUserBalance();
+  //     setIsLoading(false);
+  //   },
+  // });
 
   const handleBuy = async () => {
+   let marketplaceActor = createActor(
+      MARKETPLACE_CANISTER,
+      marketIDL,
+      authenticatedAgent
+    );
+
+    const IcpActor = createActor(
+      MY_LEDGER_CANISTER_ID,
+      ICPDL,
+      authenticatedAgent
+    );
     try {
       if (!user || !authenticatedAgent) {
         displayNotificationModal("Log in first to purchase this NFT", "error");
         return;
       }
-
-      let marketplaceActor = createActor(
-        MARKETPLACE_CANISTER,
-        marketIDL,
-        authenticatedAgent
-      );
-
-      const IcpActor = createActor(
-        MY_LEDGER_CANISTER_ID,
-        ICPDL,
-        authenticatedAgent
-      );
 
       setIsLoading(true);
       //approve the marketplace to transfer funds on the user/s behalf
@@ -80,38 +81,62 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
 
       console.log("approve results :", approveResults);
 
+      if (approveResults.Err) {
+        displayNotificationModal("error in approving ICP amount", "error");
+        setIsLoading(false);
+        return;
+      }
+
       let res = await marketplaceActor.buy_nft(nftid);
 
       if (res.status == 200 && res.status_text == "Ok") {
-        displayNotificationModal("NFT purchase successful", "success");
+        displayNotificationModal(
+          "NFT purchase successful. Your NFT will be sent to your wallet shortly",
+          "success"
+        );
+        setIsLoading(false);
+        queryClient.setQueryData(["refreshData"], "doit");
       } else {
         displayNotificationModal(res.error_text, "error");
+        setIsLoading(false);
+        queryClient.setQueryData(["refreshData"], Math.random());
       }
-      console.log("buy results :", res);
     } catch (error) {
       console.log("error in buying nft :", error);
     }
+    setIsLoading(false);
+
     // navigate("/profile");
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   return (
     <div className="flex w-1/2">
       {showModal && (
         <div
-          className={`absolute top-10 z-50 text-xs  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
-            modalType === "success"
-              ? "bg-green-100 text-green-800 border border-green-300 rounded-lg p-1 animate-slide-in"
-              : "bg-red-100 text-red-800 border border-red-300 rounded-lg p-1 animate-slide-in"
-          }`}
+          className={`fixed inset-0 z-50 flex items-center justify-center`}
         >
-          <div className="modal-message">
+          <div
+            className={`flex items-center flex-col text-white border p-2 rounded-lg ${
+              modalType == "success" ? "bg-green-800" : "bg-red-500"
+            }`}
+          >
             <p>{modalMessage}</p>
+            <button
+              className="mt-2 w-[50px] bg-gray-200 text-gray-800 rounded px-1 py-1"
+              onClick={handleCloseModal}
+            >
+              ok
+            </button>
           </div>
         </div>
       )}
 
       <button
-        onClick={() => HandleBuy()}
+        onClick={() => handleBuy()}
         className="flex bg-[#2E8DEE] w-full rounded-lg mt-4 text-white justify-center items-center p-2"
       >
         {isLoading ? <ClipLoader size={20} color="white" /> : "Buy"}

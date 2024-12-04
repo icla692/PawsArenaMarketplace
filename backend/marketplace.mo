@@ -575,7 +575,7 @@ actor class () = this {
                             case (#ok(num)) {
 
                                 //transfer the icp to the seller
-                                let res = await transferICP(data.seller_principal, data.nft_price -10000);
+                                let res = await transferICP(data.seller_principal, data.nft_price - 10000);
                                 if (res == true) {
                                     //record the sale transaction
 
@@ -625,7 +625,7 @@ actor class () = this {
                             };
                             case (_) {
                                 //refund the icp to the user
-                                let res = await transferICP(caller, data.nft_price -10000);
+                                let res = await transferICP(caller, data.nft_price - 10000);
                                 if (res == true) {
 
                                     //unlock the nft before returning
@@ -766,7 +766,7 @@ actor class () = this {
                     expiry_date = expiry_date;
                 });
 
-                nftOfferCount := nftOfferCount +1;
+                nftOfferCount := nftOfferCount + 1;
                 NftListingHashMap.put(nft_id, { data with offers = Buffer.toArray<OfferData>(tempBuff) });
                 return {
                     status = 200;
@@ -930,7 +930,7 @@ actor class () = this {
 
                     if (nftTransfer == true) {
                         //transfer the icp to the seller
-                        let res = await transferICP(data.seller_principal, offer.amount -10000);
+                        let res = await transferICP(data.seller_principal, offer.amount - 10000);
                         if (res == true) {
                             //save data to cofirm transaction
 
@@ -984,7 +984,7 @@ actor class () = this {
 
                     } else {
                         //refund the user their icp
-                        let res = await transferICP(offer.user, offer.amount -10000);
+                        let res = await transferICP(offer.user, offer.amount - 10000);
                         if (res == true) {
 
                             // Unlock the NFT after the process is completed
@@ -1111,7 +1111,6 @@ actor class () = this {
     };
 
 };
-
 
 // [dependencies]
 // base = "0.11.2"

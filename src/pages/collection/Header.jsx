@@ -56,7 +56,7 @@ console.log("dddd :",collectionData);
                     <div className="text-white text-center">
                         {isExpanded
                             ? collectionData?.description
-                            : `${collectionData?.description.slice(0, 150)}...`}
+                            : `${collectionData?.description?.slice(0, 150)}...`}
                     </div>
                     <button
                         onClick={toggleDescription}

@@ -41,7 +41,7 @@ const Card = ({ collectionID, nft }) => {
         {nft[1]?.price ? (
           <div className="flex gap-1">
             <img src={ICPlogo} height="7px" width="15px" alt="logo" />
-            <span>{(Number(nft[1]?.price) / 1e8)?.toFixed(2)}</span>
+            <span>{(Number(nft[1]?.price) / 1e8)?.toFixed(3)}</span>
           </div>
         ) : (
           "unlisted"

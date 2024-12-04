@@ -4,14 +4,18 @@ import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import { createActor } from "../../Utils/createActor";
-import { MARKETPLACE_CANISTER } from "../../Utils/constants";
+import {
+  convertExpiryDate,
+  MARKETPLACE_CANISTER,
+  shortenAddress,
+} from "../../Utils/constants";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { useNavigate } from "react-router-dom";
 const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
   const authenticatedAgent = useAgent();
   const { user } = useIdentityKit();
- const navigate = useNavigate()
-const queryClient = useQueryClient()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -27,12 +31,12 @@ const queryClient = useQueryClient()
     setModalMessage(_message);
     setModalType(_type);
     setShowModal(true);
-    setTimeout(() => setShowModal(false), 3000);
+    // setTimeout(() => setShowModal(false), 3000);
   };
 
   const handleAccept = async (offer, nft) => {
     try {
-      setAcceptLoading(true)
+      setAcceptLoading(true);
       let marketplaceActor = createActor(
         MARKETPLACE_CANISTER,
         marketIDL,
@@ -43,9 +47,12 @@ const queryClient = useQueryClient()
         return;
       }
 
-      console.log("selected offer :",selectedOffer);
-      
-      let res = await marketplaceActor?.accept_offer(selectedOffer.nft,selectedOffer.offer.offer_id);
+      console.log("selected offer :", selectedOffer);
+
+      let res = await marketplaceActor?.accept_offer(
+        selectedOffer.nft,
+        selectedOffer.offer.offer_id
+      );
       console.log("accept nft sale :", res);
 
       if (res.status == 200 && res.status_text == "Ok") {
@@ -55,15 +62,13 @@ const queryClient = useQueryClient()
       }
 
       queryClient.setQueryData(["refreshData"], Math.random());
-
-      
     } catch (error) {
       console.log("error in accepting offer :", error);
     }
 
-    setAcceptLoading(false)
-     setAcceptModal(false)
-     navigate("/")
+    setAcceptLoading(false);
+    setAcceptModal(false);
+    navigate("/");
   };
 
   const handleCancel = async () => {
@@ -98,13 +103,8 @@ const queryClient = useQueryClient()
     setCancelLoading(false);
   };
 
-  const convertExpiryDate = (expiry) => {
-    const date = new Date(Number(expiry) / 1e6);
-    return date.toLocaleString(); // Adjust options as needed for formatting
-  };
-
-  const shortenAddress = (address) => {
-    return `${address?.slice(0, 6)}...${address?.slice(-4)}`;
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -206,52 +206,56 @@ const queryClient = useQueryClient()
           </tr>
         </thead>
         <tbody className=" divide-y divide-gray-200">
-          {offers?.length >0 ?offers?.map((offer, index) => (
-            <tr key={index}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                {shortenAddress(offer?.user?.toString())}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                {Number(offer?.amount) / 1e8} ICP
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                {convertExpiryDate(Number(offer?.expiry_date))}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                <div className="flex flex-col items-center justify-center gap-1">
-                  {user &&
-                    user?.principal?.toString() == offer?.user?.toString() && (
+          {offers?.length > 0 ? (
+            offers?.map((offer, index) => (
+              <tr key={index}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  {shortenAddress(offer?.user?.toString())}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  {Number(offer?.amount) / 1e8} ICP
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  {convertExpiryDate(Number(offer?.expiry_date))}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    {user &&
+                      user?.principal?.toString() ==
+                        offer?.user?.toString() && (
+                        <button
+                          // onClick={() => handleCancel(offer, nft)}
+                          onClick={() => {
+                            setSelectedOffer({ offer, nft });
+                            setCancelModal(true);
+                          }}
+                          className="flex  bg-red-500 p-1 rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      )}
+
+                    {user && user?.principal?.toString() == nftOwner && (
                       <button
-                        // onClick={() => handleCancel(offer, nft)}
                         onClick={() => {
                           setSelectedOffer({ offer, nft });
-                          setCancelModal(true);
+                          setAcceptModal(true);
                         }}
-                        className="flex  bg-red-500 p-1 rounded-lg"
+                        className="flex bg-green-500 p-1 rounded-lg"
                       >
-                        Cancel
+                        Accept
                       </button>
                     )}
-
-                  {user && user?.principal?.toString() == nftOwner && (
-                    <button
-                      onClick={() => {
-                        setSelectedOffer({ offer, nft });
-                        setAcceptModal(true);
-                      }}
-                      className="flex bg-green-500 p-1 rounded-lg"
-                    >
-                      Accept
-                    </button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          )
-        ):
-        <div className="flex w-full justify-center items-center text-xs mt-3"> No offers available</div>
-      
-      }
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <div className="flex w-full justify-center items-center text-xs mt-3">
+              {" "}
+              No offers available
+            </div>
+          )}
         </tbody>
       </table>
     </div>

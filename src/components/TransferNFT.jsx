@@ -37,13 +37,7 @@ const TransferNFT = ({ nft, handleTrigger }) => {
     setTimeout(() => setShowModal(false), 3000);
   };
 
-  const { mutateAsync: HandleTransfer } = useMutation({
-    mutationFn: (e) => handleTransfer(e),
-    onSuccess: async () => {
-      invalidateListings();
-      setButtonLoading(false);
-    },
-  });
+
 
   const handleTransfer = async (e) => {
     e.preventDefault();
@@ -91,19 +85,20 @@ const TransferNFT = ({ nft, handleTrigger }) => {
 
       if (transferResults.ok) {
         displayNotificationModal("NFT transfer successful", "success");
+        queryClient.setQueryData(["refreshData"], Math.random());
+        handleTrigger();
       } else {
         displayNotificationModal(transferResults.err, "error");
+
+        queryClient.setQueryData(["refreshData"], Math.random());
+        handleTrigger();
       }
 
       console.log("transfer success", transferResults);
     } catch (error) {
       console.log("error in transfering nft :", error);
     }
-
-    queryClient.setQueryData(["refreshData"], Math.random());
-
     setButtonLoading(false);
-    // handleTrigger();
   };
 
   return (

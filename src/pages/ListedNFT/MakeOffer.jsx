@@ -31,7 +31,7 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
     setModalMessage(_message);
     setModalType(_type);
     setShowModal(true);
-    setTimeout(() => setShowModal(false), 3000);
+    // setTimeout(() => setShowModal(false), 3000);
   };
 
   const handleMakeOffer = async (e) => {
@@ -39,6 +39,8 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
     setButtonLoading(true);
     try {
       if (!user || !authenticatedAgent) {
+        displayNotificationModal("Log in first to make an Offer", "error");
+
         return;
       }
 
@@ -84,7 +86,7 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
       } else {
         displayNotificationModal(res.error_text, "error");
       }
-      handleTrigger();
+       handleTrigger();
 
       console.log("offer results here:", res);
     } catch (error) {
@@ -99,6 +101,12 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
     },
   });
 
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+
   return (
     <div className="flex bg-[#2c2d2e] w-1/2 rounded-lg mt-4 text-white justify-center items-center p-2 cursor-pointer">
       <button onClick={() => setOfferModalOpen(true)}>Make Offer</button>
@@ -106,18 +114,24 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
       {isOfferModalOpen && (
         <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
           {showModal && (
-            <div
-              className={`absolute top-10 text-xs z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
-                modalType === "success"
-                  ? "bg-green-100 text-green-800 border border-green-300 rounded-lg p-1 animate-slide-in"
-                  : "bg-red-100 text-red-800 border border-red-300 rounded-lg p-1 animate-slide-in"
-              }`}
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-center`}
+        >
+          <div
+            className={`flex items-center flex-col text-white border p-2 rounded-lg ${
+              modalType == "success" ? "bg-green-800" : "bg-red-500"
+            }`}
+          >
+            <p>{modalMessage}</p>
+            <button
+              className="mt-2 w-[50px] bg-gray-200 text-gray-800 rounded px-1 py-1"
+              onClick={handleCloseModal}
             >
-              <div className="modal-message">
-                <p>{modalMessage}</p>
-              </div>
-            </div>
-          )}
+              ok
+            </button>
+          </div>
+        </div>
+      )}
           <div className="bg-[#252525] rounded-lg shadow-lg p-6 w-96">
             <div className="flex justify-between ">
               <h2 className="text-xl font-bold mb-4">Make Offer</h2>
