@@ -245,13 +245,8 @@ const CollectionDetails = () => {
       console.log("all tokens :", myTokens);
     }
 
-    if (searchQuery) {
-      filteredProducts = filteredProducts?.filter((nft) =>
-        (nft[0] +1)?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    // Apply price filtering if minPrice or maxPrice is set
-    if (minPrice) {
+     // Apply price filtering if minPrice or maxPrice is set
+     if (minPrice) {
       filteredProducts = filteredProducts?.filter(
         (nft) => Number(nft[1]?.price) / 1e8 >= parseFloat(minPrice)
       );
@@ -262,6 +257,13 @@ const CollectionDetails = () => {
         (nft) => Number(nft[1]?.price) / 1e8 <= parseFloat(maxPrice)
       );
     }
+
+    if (searchQuery) {
+      filteredProducts = filteredProducts?.filter((nft) =>
+        (nft[0] +1)?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+   
 
 
     // Filter based on selectedOptions

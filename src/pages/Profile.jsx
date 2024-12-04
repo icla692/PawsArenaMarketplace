@@ -255,7 +255,6 @@ const Profile = () => {
               navigate(
                 nft.type === "Listed" &&
                   "../marketplace/" + nft.canister_id + "/" + nft.nftid
-                // : "../nft/" + nft.canister_id + "/" + nft.nftid
               )
             }
             className={style.nftImg}
