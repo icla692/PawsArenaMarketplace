@@ -11,17 +11,25 @@ import ListNFT from "../components/ListNFT";
 import { useNavigate } from "react-router-dom";
 import TransferNFT from "../components/TransferNFT";
 import TransferICP from "../components/TransferICP";
-import { useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./ListedNFT/UpdatePrice";
 import { ClipLoader } from "react-spinners";
 import SearchP from "./Profile/SearchP";
 import NftDisplay from "./Profile/DisplayNFTs";
 import ActivityTable from "./Profile/ActivityTable";
 import { BsCopy } from "react-icons/bs";
-import { copyToClipboard, shortenAddress } from "../Utils/constants";
+import {
+  copyToClipboard,
+  MARKETPLACE_CANISTER,
+  PAWS_ARENA_CANISTER,
+  shortenAddress,
+} from "../Utils/constants";
 import Balance from "../components/Balance";
 import { IoIosArrowBack } from "react-icons/io";
-
+import { HttpAgent } from "@dfinity/agent";
+import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
+import { createActor } from "../Utils/createActor";
+import { idlFactory as PawsIDL } from "../Utils/paws.did";
 const style = {
   wrapper: `flex mt-[80px] min-h-screen bg-[#121212] flex-col w-full items-center px-[1.2rem] md:px-[4.2rem] py-4 text-white`,
   profileSection: `flex flex-col border rounded-lg w-full max-w-3xl max-h-2xl mb-6 `,
@@ -40,62 +48,45 @@ const style = {
   assetName: `font-bold mt-1`, // Responsive text sizes
   buttonsContainer: `absolute bottom-6 left-0 right-0 flex flex-row  justify-center items-center`, // Hidden by default
 };
-const Profile = () => {
-  const [userNFTList, setuserNFTList] = useState(null);
 
+const agent = new HttpAgent({ host: "https://ic0.app", retryTimes: 10 });
+let marketplaceActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
+const nftActor = createActor(PAWS_ARENA_CANISTER, PawsIDL, agent);
+
+
+
+const Profile = () => {
   const [collectedNFTS, setCollectedNFTS] = useState([]);
   const [listedNFTS, setListedNFTS] = useState([]);
-
-  const [userAccount, setUserAccount] = useState(null);
   const [trigger, setTrigger] = useState("");
+
+  const [selectedTab, setSelectedTab] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState(
+    "rw7qm-eiaaa-aaaak-aaiqq-cai"
+  );
+
   const { user } = useIdentityKit();
-  const { data: userPrincipal } = useQuery({
-    queryKey: ["userPrincipal"],
-  });
+  const authenticatedAgent = useAgent();
+  const navigate = useNavigate();
 
   const { data: refreshData } = useQuery({
     queryKey: ["refreshData"],
-  });
-
-  const { data: userIcpBalance } = useQuery({
-    queryKey: ["userIcpBalance"],
-  });
-
-  const { data: marketplaceActor } = useQuery({
-    queryKey: ["marketplaceActor"],
-  });
-
-  const { data: nftActor } = useQuery({
-    queryKey: ["nftActor"],
   });
 
   const { data: bulkData } = useQuery({
     queryKey: ["bulkData"],
   });
 
-  const { data: IcpActor } = useQuery({ queryKey: ["IcpActor"] });
-
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!userPrincipal) return;
-    let res = AccountIdentifier.fromPrincipal({
-      principal: Principal.fromText(userPrincipal),
-      subAccount: undefined,
-    }).toHex();
-    console.log(res);
-    setUserAccount(res);
-  }, [userPrincipal]);
-
   useEffect(() => {
     const fetchUserListedNFTS = async () => {
       try {
         let collected = [];
         let listed = [];
-        if (!userPrincipal || !marketplaceActor) return;
+
+        if (!user || !marketplaceActor) return;
+
         let res = await marketplaceActor?.get_all_user_listed_nfts(
-          Principal.fromText(userPrincipal)
+          user?.principal
         );
 
         console.log("heeee :", res.data[0]);
@@ -118,14 +109,13 @@ const Profile = () => {
         }
 
         let accIdentifier = AccountIdentifier.fromPrincipal({
-          principal: Principal.fromText(userPrincipal),
+          principal: user.principal,
           subAccount: undefined,
         }).toHex();
 
         let ownedTokens = await nftActor?.tokens(accIdentifier);
 
         let tokens = Array.from(ownedTokens?.ok);
-        console.log("ahaha :", tokens);
 
         if (tokens && tokens.length > 0) {
           for (const data of tokens) {
@@ -147,18 +137,10 @@ const Profile = () => {
     fetchUserListedNFTS();
   }, [user, trigger, refreshData]);
 
+
+  
+
   const handleTrigger = (e) => setTrigger(Math.random());
-
-  // const shortenAddress = (address, nom) => {
-  //   return `${address.slice(0, nom)}...${address.slice(-7)}`;
-  // };
-
-  ///sort the displayed NFTs
-
-  const [selectedTab, setSelectedTab] = useState("");
-  const [selectedCollection, setSelectedCollection] = useState(
-    "rw7qm-eiaaa-aaaak-aaiqq-cai"
-  );
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);

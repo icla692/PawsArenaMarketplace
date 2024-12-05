@@ -44,8 +44,6 @@ const ListNFT = ({ nft, handleTrigger }) => {
     },
   });
 
-
-
   const handleList = async (e) => {
     e.preventDefault();
 
@@ -105,7 +103,13 @@ const ListNFT = ({ nft, handleTrigger }) => {
 
       if (res?.status == 200 && res?.status_text == "Ok") {
         displayNotificationModal("NFT listed successfully", "success");
+        queryClient.setQueryData(["refreshData"], Math.random().toString());
+        queryClient.invalidateQueries(["listedNfts"]);
+
       } else {
+        queryClient.setQueryData(["refreshData"], Math.random().toString());
+        queryClient.invalidateQueries(["listedNfts"]);
+
         displayNotificationModal(res.error_text, "error");
       }
     } catch (error) {

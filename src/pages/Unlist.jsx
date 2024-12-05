@@ -61,7 +61,7 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
         displayNotificationModal(res?.error_text, "error");
         navigate("/profile");
       }
-      handleTrigger();
+      // handleTrigger();
       queryClient.setQueryData(["refreshData"], Math.random());
       console.log("unlisting res :", res);
     } catch (error) {

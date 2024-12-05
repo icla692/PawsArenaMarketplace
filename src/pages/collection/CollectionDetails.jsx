@@ -1,7 +1,11 @@
 import { HttpAgent } from "@dfinity/agent";
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { MARKETPLACE_CANISTER, NFTCollections } from "../../Utils/constants";
+import {
+  MARKETPLACE_CANISTER,
+  NFTCollections,
+  PAWS_ARENA_CANISTER,
+} from "../../Utils/constants";
 import { createActor } from "../../Utils/createActor";
 import { idlFactory } from "../../Utils/paws.did";
 import Header from "./Header";
@@ -9,6 +13,7 @@ import ListedNFTs from "./ListedNFTs";
 import Searchbar from "./Searchbar";
 import Card from "./Card";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
+import { idlFactory as PawsIDL } from "../../Utils/paws.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { traitsData } from "../../Utils/constants";
 import genes from "../../genes";
@@ -18,6 +23,9 @@ const HOST =
     ? "https://ic0.app"
     : "http://localhost:4943";
 const agent = new HttpAgent({ host: HOST, retryTimes: 10 });
+
+let marketplaceActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
+const nftActor = createActor(PAWS_ARENA_CANISTER, PawsIDL, agent);
 
 const CollectionDetails = () => {
   const { collectionID } = useParams();
@@ -29,24 +37,33 @@ const CollectionDetails = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+const [listt,setListt] = useState([])
+
+  const { data: refreshData } = useQuery({
+    queryKey: ["refreshData"],
+  });
+
+  console.log("refresh data :", refreshData);
 
   //sort the nft according to the nft traits
   const [expandedSections, setExpandedSections] = useState({});
   const [selectedOptions, setSelectedOptions] = useState({});
-  
+
   const handleSectionClick = (trait) => {
     setExpandedSections((prev) => ({
       ...prev,
       [trait]: !prev[trait],
     }));
   };
-  
+
   const handleOptionClick = (trait, color, id) => {
     setSelectedOptions((prev) => {
       const newOptions = { ...prev };
       if (newOptions[trait]) {
         if (newOptions[trait].includes(id)) {
-          newOptions[trait] = newOptions[trait].filter((option) => option !== id);
+          newOptions[trait] = newOptions[trait].filter(
+            (option) => option !== id
+          );
           if (newOptions[trait].length === 0) {
             delete newOptions[trait];
           }
@@ -88,22 +105,65 @@ const CollectionDetails = () => {
 
   // const { data: myTokens, isLoading: dataLoading } = useQuery({ queryKey: ["myTokens"] });
 
-  const { data: collectionDetails, isLoading: collectionLoading } = useQuery({
+  const { data: collectionDetails } = useQuery({
     queryKey: ["collectionDetails"],
   });
 
+  // //get listed nfts
+  // useEffect(() => {
+  //   const getListedNfts = async () => {
+  //     try {
+  //       console.log(collectionID);
+  //       //get all the tokens in the collection
+  //       let tokenListings = bulkData?.find((det) => det[0] === collectionID);
+
+  //       const marketNFTsResponse =
+  //         await marketplaceActor?.get_all_listed_nfts();
+
+  //       const filteredMarketNFTs =
+  //         marketNFTsResponse?.data[0]?.filter(
+  //           (nft) => nft[1].nft_canister == collectionID
+  //         ) || [];
+
+  //       const nftIds = filteredMarketNFTs?.map((nft) => [
+  //         nft[1].nft_id,
+  //         {
+  //           locked: [],
+  //           seller: nft[1].seller_principal,
+  //           price: nft[1].nft_price,
+  //           inhouse_sale: true,
+  //         },
+  //       ]);
+
+  //       const combinedListings = [...nftIds];
+  //       const lookup = Object.fromEntries(
+  //         combinedListings.map((item) => [item[0], item])
+  //       );
+  //       const updatedTokens = tokenListings[1]?.allNftTokens?.map((item) =>
+  //         lookup[item[0]] ? lookup[item[0]] : item
+  //       );
+
+  //       queryClient.setQueryData(["myTokens"], updatedTokens);
+  //     } catch (error) {
+  //       console.log("error in getting listed nfts :", error);
+  //     }
+  //   };
+
+  //   getListedNfts();
+  // }, [refreshData, collectionID]);
+
+
+  //get all the lsited nfts
   useEffect(() => {
     const fetchNFTDetails = async () => {
-      // if (!collectionID) return;
+       if (!collectionID) return;
       setIsLoading(true);
-
       try {
-        const marketActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
         const filteredCollection = NFTCollections.find(
           (col) => col.canisterId === collectionID
         );
 
-        const marketNFTsResponse = await marketActor?.get_all_listed_nfts();
+        const marketNFTsResponse = await marketplaceActor?.get_all_listed_nfts();
         const filteredMarketNFTs =
           marketNFTsResponse?.data[0]?.filter(
             (nft) => nft[1].nft_canister == collectionID
@@ -125,25 +185,14 @@ const CollectionDetails = () => {
           (det) => det.canisterId == collectionID
         );
 
-        // Combine results
+        // Combine results with the nfts listed on entrepot if any
         const combinedListings = [...nftIds];
-
-        //const combinedListings = [...tokenListings[1]?.listings, ...nftIds];
-        // setListedNfts(combinedListings);
-        // Fetch additional stats and tokens
-        // const nftStats = await nftActor.stats();
-        // const allTokensResponse = await nftActor.getTokens();
-
-        // Create a lookup for easy access to listed NFTs
-
         const lookup = Object.fromEntries(
           combinedListings.map((item) => [item[0], item])
         );
         const updatedTokens = tokenListings[1]?.allNftTokens?.map((item) =>
           lookup[item[0]] ? lookup[item[0]] : item
         );
-
-        console.log("all ttt :", updatedTokens);
 
         // setAllTokens(updatedTokens);
         queryClient.setQueryData(["myTokens"], updatedTokens);
@@ -167,7 +216,7 @@ const CollectionDetails = () => {
       }
     };
     fetchNFTDetails();
-  }, [collectionID]); // Only re-run when collectionID changes
+  }, [collectionID, refreshData]);
 
   // Pagination functions
   const nextPage = () => {
@@ -203,9 +252,7 @@ const CollectionDetails = () => {
 
   // Filtering and sorting logic using memoization for performance
   const finalFilteredData = useMemo(() => {
-    let filteredProducts = listedNfts?.length > 0 ? [...listedNfts] : []; // Start with a copy of listedNfts
-
-
+    let filteredProducts = myTokens?.length > 0 ? [...myTokens] : []; // Start with a copy of listedNfts
 
     // Apply sorting based on sortPrice
     if (sortPrice) {
@@ -215,15 +262,13 @@ const CollectionDetails = () => {
           const rarityB = Rarity[b[0]];
           return rarityA - rarityB;
         });
-      } 
-      else if(sortPrice === "rarityindexdesc"){
+      } else if (sortPrice === "rarityindexdesc") {
         filteredProducts = myTokens?.sort((a, b) => {
           const rarityA = Rarity[a[0]];
           const rarityB = Rarity[b[0]];
           return rarityB - rarityA;
         });
-      }
-      else  {
+      } else {
         filteredProducts?.sort((a, b) =>
           sortPrice === "lowtohigh"
             ? Number(a[1]?.price || 0) - Number(b[1]?.price || 0)
@@ -231,8 +276,6 @@ const CollectionDetails = () => {
         );
       }
     }
-
-
 
     // Apply the listedFilter
     if (listedFilter === "listed") {
@@ -245,8 +288,8 @@ const CollectionDetails = () => {
       console.log("all tokens :", myTokens);
     }
 
-     // Apply price filtering if minPrice or maxPrice is set
-     if (minPrice) {
+    // Apply price filtering if minPrice or maxPrice is set
+    if (minPrice) {
       filteredProducts = filteredProducts?.filter(
         (nft) => Number(nft[1]?.price) / 1e8 >= parseFloat(minPrice)
       );
@@ -260,11 +303,21 @@ const CollectionDetails = () => {
 
     if (searchQuery) {
       filteredProducts = filteredProducts?.filter((nft) =>
-        (nft[0] +1)?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        (nft[0] + 1)
+          ?.toString()
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
       );
     }
-   
 
+    // Apply sorting based on sortPrice
+    if (sortPrice) {
+      filteredProducts?.sort((a, b) =>
+        sortPrice === "lowtohigh"
+          ? Number(a[1].price) - Number(b[1].price)
+          : Number(b[1].price) - Number(a[1].price)
+      );
+    }
 
     // Filter based on selectedOptions
     if (Object.keys(selectedOptions).length > 0) {
@@ -291,6 +344,7 @@ const CollectionDetails = () => {
       ));
   }, [
     listedNfts,
+    myTokens,
     allTokens,
     searchQuery,
     sortPrice,
@@ -299,6 +353,7 @@ const CollectionDetails = () => {
     maxPrice,
     currentPage,
     selectedOptions,
+    refreshData
   ]);
   // Calculate total pages based on all tokens
   const totalPages = Math.ceil(myTokens?.length / itemsPerPage);

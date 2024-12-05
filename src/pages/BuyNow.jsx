@@ -35,15 +35,6 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // const { mutateAsync: HandleBuy } = useMutation({
-  //   mutationFn: () => handleBuy(),
-  //   onSuccess: async () => {
-  //     invalidateListings();
-  //     invalidateUserNfts();
-  //     invalidateUserBalance();
-  //     setIsLoading(false);
-  //   },
-  // });
 
   const handleBuy = async () => {
    let marketplaceActor = createActor(
@@ -95,11 +86,11 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
           "success"
         );
         setIsLoading(false);
-        queryClient.setQueryData(["refreshData"], "doit");
+        queryClient.setQueryData(["refreshData"], Math.random().toString());
       } else {
         displayNotificationModal(res.error_text, "error");
         setIsLoading(false);
-        queryClient.setQueryData(["refreshData"], Math.random());
+        queryClient.setQueryData(["refreshData"], Math.random().toString());
       }
     } catch (error) {
       console.log("error in buying nft :", error);

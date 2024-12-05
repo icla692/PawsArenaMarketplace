@@ -125,6 +125,7 @@ const useFecth = () => {
       await queryClient.setQueryData(["userNFTS"], userNFTS);      
     }
   };
+  
 
   const loadUserNfts = async () => {
     let NFTArray = [];

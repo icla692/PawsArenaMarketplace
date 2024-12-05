@@ -62,6 +62,7 @@ const Searchbar = ({
             <option value="rarityindexasc">NFT Rarity Index(Asc)</option>
             <option value="rarityindexdesc">NFT Rarity Index(Desc)</option>
 
+
           </select>
           {/* {
             pages && pages?.map((page)=>(
@@ -181,7 +182,6 @@ const Searchbar = ({
             >
               <option value="lowtohigh">Price Low to High</option>
               <option value="hightolow">Price High to Low</option>
-              <option value="rarityindex">NFT Rarity Index</option>
             </select>
 
             {/* Price Filter in Modal */}
