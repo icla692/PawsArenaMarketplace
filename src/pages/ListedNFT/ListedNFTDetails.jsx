@@ -35,6 +35,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import BuyNow from "../BuyNow";
 import genes from "../../genes";
 import { BsCopy } from "react-icons/bs";
+import Rarity from "../../rarity.json";
 
 const ListedNFTDetails = () => {
   const { colID, nftID } = useParams();
@@ -236,7 +237,7 @@ const ListedNFTDetails = () => {
             </div>
           </div>
           <div className="flex  justify flex-col w-full md:w-1/2 ">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <div className="flex">
                 <button
                   className="flex border rounded-md px-2 "
@@ -246,8 +247,11 @@ const ListedNFTDetails = () => {
                 </button>
               </div>
               <h1 className="text-[30px] font-bold">
-                {nftDetails && "ICKitties"} # {Number(nftID)+1}
+                {nftDetails && "ICKitties"} # {Number(nftID) + 1}
               </h1>
+              <span className=" text-sm">
+                NRI: {(Rarity[Number(nftID)] * 100).toFixed(1)}%{" "}
+              </span>
 
               <div className="flex items-center gap-2">
                 <span>
