@@ -10,7 +10,7 @@ import {
   MY_LEDGER_CANISTER_ID,
 } from "../../Utils/constants";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { idlFactory as ICPDL } from "../../Utils/icptoken.did";
 import { Principal } from "@dfinity/principal";
 const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
@@ -25,7 +25,13 @@ const MakeOffer = ({ nftid, nft_price, handleTrigger }) => {
 
   const { user } = useIdentityKit();
 
-  const authenticatedAgent = useAgent({ retryTimes: 2 });
+  // const authenticatedAgent = useAgent({ retryTimes: 2 });
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
 
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);

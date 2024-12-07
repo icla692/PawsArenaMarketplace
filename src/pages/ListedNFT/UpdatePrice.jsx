@@ -5,8 +5,9 @@ import { ClipLoader } from "react-spinners";
 import useFecth from "../../Utils/useFecth";
 import { createActor } from "../../Utils/createActor";
 import { MARKETPLACE_CANISTER } from "../../Utils/constants";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
+import { HttpAgent } from "@dfinity/agent";
 
 const UpdatePrice = ({ nft, handleTrigger }) => {
   // console.log("update price :", nft);
@@ -16,7 +17,19 @@ const UpdatePrice = ({ nft, handleTrigger }) => {
   const [updateloading, setUpdateLoading] = useState(false);
   const { invalidateListings } = useFecth();
   const [listbuttonLoading, setListButtonLoading] = useState(false);
-  const authenticatedAgent = useAgent();
+
+
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
+
+
   const { user } = useIdentityKit();
 
   const [showModal, setShowModal] = useState(false);

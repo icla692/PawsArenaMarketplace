@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
-const NotificationCard = ({showModal,modalMessage,modalType}) => {
-
-    const [showModal, setShowModal] = useState(false);
+const NotificationCard = ({ showModal, modalMessage, modalType }) => {
+  const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
 
@@ -10,13 +9,10 @@ const NotificationCard = ({showModal,modalMessage,modalType}) => {
     setShowModal(false);
   };
 
-
   return (
-   <>
-    {showModal && (
-        <div
-          className={`fixed inset-0 z-50 flex items-center justify-center`}
-        >
+    <>
+      {showModal && (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center`}>
           <div
             className={`flex items-center flex-col text-white border p-2 rounded-lg ${
               modalType == "success" ? "bg-green-800" : "bg-red-500"
@@ -32,12 +28,8 @@ const NotificationCard = ({showModal,modalMessage,modalType}) => {
           </div>
         </div>
       )}
+    </>
+  );
+};
 
-   
-   
-   
-   </>
-  )
-}
-
-export default NotificationCard
+export default NotificationCard;

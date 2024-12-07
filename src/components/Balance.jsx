@@ -4,7 +4,7 @@ import useFetch from "../Utils/useFecth"; // Fixed typo in import
 import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { Principal } from "@dfinity/principal";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import {
   isPrincipalOrAccount,
   MY_LEDGER_CANISTER_ID,
@@ -32,7 +32,20 @@ const Balance = () => {
   const [icpBalance, setIcpBalance] = useState(0);
 
   const { user } = useIdentityKit();
-  const authenticatedAgent = useAgent();
+
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
+
+
+
+
   const queryClient = useQueryClient();
   // Fetch data using React Query
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =

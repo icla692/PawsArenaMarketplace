@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const SearchP = ({selectedTab,handleTabClick}) => {
-  
-
+const SearchP = ({ selectedTab, handleTabClick }) => {
   const tabStyle = (tab) =>
     `cursor-pointer p-2  ${
-      selectedTab === tab ? " text-white border-b-4 border-blue-500" : "bg-transparent"
+      selectedTab === tab
+        ? " text-white border-b-4 border-blue-500"
+        : "bg-transparent"
     }`;
 
   return (

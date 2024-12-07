@@ -3,11 +3,12 @@ import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../Utils/useFecth";
-import { useAgent } from "@nfid/identitykit/react";
+import { useAgent, useIdentity } from "@nfid/identitykit/react";
 import { MARKETPLACE_CANISTER } from "../Utils/constants";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { createActor } from "../Utils/createActor";
 import { useNavigate } from "react-router-dom";
+import { HttpAgent } from "@dfinity/agent";
 const UnlistUpdate = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -17,11 +18,17 @@ const UnlistUpdate = ({ nft, handleTrigger }) => {
   const [modalType, setModalType] = useState(""); // "success" or "error"
 
   const { invalidateListings, invalidateUserNfts } = useFecth();
-  const authenticatedAgent = useAgent();
+
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient()
-
+  const queryClient = useQueryClient();
 
   const displayNotificationModal = async (_message, _type) => {
     setModalMessage(_message);

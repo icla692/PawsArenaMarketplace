@@ -12,6 +12,8 @@ import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { createActor } from "../Utils/createActor";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { idlFactory as ICPDL } from "../Utils/icptoken.did";
+import { useIdentity } from "@nfid/identitykit/react";
+import { HttpAgent } from "@dfinity/agent";
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +24,14 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =
     useFecth();
 
-  const authenticatedAgent = useAgent({ retryTimes: 3 });
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+  // const authenticatedAgent = useAgent();
+
   const { user } = useIdentityKit();
 
   const displayNotificationModal = async (_message, _type) => {
@@ -35,9 +44,8 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-
   const handleBuy = async () => {
-   let marketplaceActor = createActor(
+    let marketplaceActor = createActor(
       MARKETPLACE_CANISTER,
       marketIDL,
       authenticatedAgent
@@ -107,9 +115,7 @@ const BuyNow = ({ nftid, nft_price, userP }) => {
   return (
     <div className="flex w-1/2">
       {showModal && (
-        <div
-          className={`fixed inset-0 z-50 flex items-center justify-center`}
-        >
+        <div className={`fixed inset-0 z-50 flex items-center justify-center`}>
           <div
             className={`flex items-center flex-col text-white border p-2 rounded-lg ${
               modalType == "success" ? "bg-green-800" : "bg-red-500"

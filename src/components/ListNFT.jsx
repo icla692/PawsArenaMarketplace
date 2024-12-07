@@ -6,10 +6,11 @@ import { ClipLoader } from "react-spinners";
 import { computeExtTokenIdentifier } from "../Utils/tid";
 import { MARKETPLACE_CANISTER, PAWS_ARENA_CANISTER } from "../Utils/constants";
 import useFecth from "../Utils/useFecth";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { createActor } from "../Utils/createActor";
 import { idlFactory as marketIDL } from "../Utils/markeptlace.did";
 import { idlFactory as PawsIDL } from "../Utils/paws.did";
+import { HttpAgent } from "@dfinity/agent";
 const ListNFT = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrice, setNewPrice] = useState(0);
@@ -17,7 +18,19 @@ const ListNFT = ({ nft, handleTrigger }) => {
   const queryClient = useQueryClient();
 
   const { invalidateListings } = useFecth();
-  const authenticatedAgent = useAgent();
+
+
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
+
+
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");

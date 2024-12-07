@@ -11,7 +11,7 @@ import ListNFT from "../components/ListNFT";
 import { useNavigate } from "react-router-dom";
 import TransferNFT from "../components/TransferNFT";
 import TransferICP from "../components/TransferICP";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import UpdatePrice from "./ListedNFT/UpdatePrice";
 import { ClipLoader } from "react-spinners";
 import SearchP from "./Profile/SearchP";
@@ -53,8 +53,6 @@ const agent = new HttpAgent({ host: "https://ic0.app", retryTimes: 10 });
 let marketplaceActor = createActor(MARKETPLACE_CANISTER, marketIDL, agent);
 const nftActor = createActor(PAWS_ARENA_CANISTER, PawsIDL, agent);
 
-
-
 const Profile = () => {
   const [collectedNFTS, setCollectedNFTS] = useState([]);
   const [listedNFTS, setListedNFTS] = useState([]);
@@ -66,7 +64,13 @@ const Profile = () => {
   );
 
   const { user } = useIdentityKit();
-  const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
   const navigate = useNavigate();
 
   const { data: refreshData } = useQuery({
@@ -136,9 +140,6 @@ const Profile = () => {
 
     fetchUserListedNFTS();
   }, [user, trigger, refreshData]);
-
-
-  
 
   const handleTrigger = (e) => setTrigger(Math.random());
 

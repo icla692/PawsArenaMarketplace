@@ -1012,9 +1012,8 @@ actor class () = this {
                             };
                         };
                     };
-
+ 
                 } else {
-
                     // Unlock the NFT after the process is completed
                     await unlock_nft(nft_id);
 
@@ -1111,14 +1110,3 @@ actor class () = this {
     };
 
 };
-
-// [dependencies]
-// base = "0.11.2"
-// array = "https://github.com/aviate-labs/array.mo#v0.1.1"
-// encoding = "https://github.com/aviate-labs/encoding.mo#v0.3.1"
-// matchers = "https://github.com/kritzcreek/motoko-matchers#v1.2.0"
-// cap = "https://github.com/stephenandrews/cap-motoko-library#v1.0.4-alt"
-// fuzz = "0.2.1"
-
-// [dev-dependencies]
-// test = "2.0.0"

@@ -5,7 +5,10 @@ import { ClipLoader } from "react-spinners";
 import { CgClose } from "react-icons/cg";
 import { Principal } from "@dfinity/principal";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
-import { isPrincipalOrAccount, MY_LEDGER_CANISTER_ID } from "../Utils/constants";
+import {
+  isPrincipalOrAccount,
+  MY_LEDGER_CANISTER_ID,
+} from "../Utils/constants";
 import { idlFactory as ICPDL } from "../Utils/icptoken.did";
 import { createActor } from "../Utils/createActor";
 import { PiHandWithdrawBold } from "react-icons/pi";
@@ -20,8 +23,9 @@ const TransferICP = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"
-  const { user } = useIdentityKit();
+
   const authenticatedAgent = useAgent();
+
   const queryClient = useQueryClient();
   // Fetch data using React Query
   const { invalidateListings, invalidateUserNfts, invalidateUserBalance } =
@@ -62,8 +66,8 @@ const TransferICP = () => {
       return;
     }
 
-    let isPrincipal = isPrincipalOrAccount(recipient)
-alert("isPrincipal : "+isPrincipal)
+    let isPrincipal = isPrincipalOrAccount(recipient);
+    alert("isPrincipal : " + isPrincipal);
     // try {
     //   const IcpActor = createActor(
     //     MY_LEDGER_CANISTER_ID,
@@ -94,18 +98,10 @@ alert("isPrincipal : "+isPrincipal)
     //   );
     // }
 
-
-    
     queryClient.setQueryData(["refreshData"], Math.random());
 
     setButtonLoading(false);
   };
-
-
-
-
-
-
 
   // Function to handle preview action
   const handlePreview = (e) => {

@@ -4,16 +4,27 @@ import { MARKETPLACE_CANISTER, MY_LEDGER_CANISTER_ID } from "../../Utils/constan
 import { Principal } from "@dfinity/principal";
 import { ClipLoader } from "react-spinners";
 import useFecth from "../../Utils/useFecth";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { idlFactory as ICPDL } from "../../Utils/icptoken.did";
 import { createActor } from "../../Utils/createActor";
+import { HttpAgent } from "@dfinity/agent";
 
 
 const BuyNow = ({ nftid, nft_price, userP }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const authenticatedAgent = useAgent();
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
+
+
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState(""); // "success" or "error"

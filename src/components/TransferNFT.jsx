@@ -11,8 +11,9 @@ import {
 } from "../Utils/constants";
 import { Principal } from "@dfinity/principal";
 import { createActor } from "../Utils/createActor";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { idlFactory as PawsIDL } from "../Utils/paws.did";
+import { HttpAgent } from "@dfinity/agent";
 const TransferNFT = ({ nft, handleTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewOpen, setPreviewOpen] = useState(false);
@@ -20,7 +21,17 @@ const TransferNFT = ({ nft, handleTrigger }) => {
   const [buttonLoading, setButtonLoading] = useState(false);
 
   const { invalidateListings } = useFecth();
-  const authenticatedAgent = useAgent();
+
+
+  // const authenticatedAgent = useAgent();
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
   const { user } = useIdentityKit();
 
   const queryClient = useQueryClient();

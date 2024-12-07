@@ -1,4 +1,4 @@
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentity, useIdentityKit } from "@nfid/identitykit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CgClose } from "react-icons/cg";
@@ -11,8 +11,21 @@ import {
 } from "../../Utils/constants";
 import { idlFactory as marketIDL } from "../../Utils/markeptlace.did";
 import { useNavigate } from "react-router-dom";
+import { HttpAgent } from "@dfinity/agent";
 const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
-  const authenticatedAgent = useAgent();
+
+
+  // const authenticatedAgent = useAgent();
+
+
+  const identity = useIdentity();
+  const authenticatedAgent = HttpAgent.createSync({
+    host: "https://ic0.app",
+    identity: identity,
+  });
+
+
+
   const { user } = useIdentityKit();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -56,19 +69,26 @@ const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
       console.log("accept nft sale :", res);
 
       if (res.status == 200 && res.status_text == "Ok") {
-        displayNotificationModal("NFT sold successfully", "success");
+        displayNotificationModal("Offer accepted successfully. NFT will be transfered to the buyer shortly", "success");
       } else {
         displayNotificationModal(res.error_text, "error");
       }
+
+      // if (res.status == 200 && res.status_text == "Ok") {
+      //   displayNotificationModal("NFT sold successfully", "success");
+      // } else {
+      //   displayNotificationModal(res.error_text, "error");
+      // }
+      // handleTrigger();
+
 
       queryClient.setQueryData(["refreshData"], Math.random());
     } catch (error) {
       console.log("error in accepting offer :", error);
     }
-
     setAcceptLoading(false);
     setAcceptModal(false);
-    navigate("/");
+    //  navigate("/profile");
   };
 
   const handleCancel = async () => {
@@ -90,6 +110,7 @@ const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
         selectedOffer?.offer.offer_id,
         selectedOffer?.nft
       );
+
       if (res.status == 200 && res.status_text == "Ok") {
         displayNotificationModal("Offer cancelled successfully", "success");
       } else {
@@ -107,23 +128,33 @@ const Offers = ({ offers, nft, nftOwner, handleTrigger }) => {
     setShowModal(false);
   };
 
+
+ 
+
   return (
     <div className="overflow-x-auto mb-10 bg-[#1B1B1B] p-2 rounded-lg border border-gray-400">
+     
+     {showModal && (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center`}>
+          <div
+            className={`flex items-center flex-col text-white border p-2 rounded-lg ${
+              modalType == "success" ? "bg-green-800" : "bg-red-500"
+            }`}
+          >
+            <p>{modalMessage}</p>
+            <button
+              className="mt-2 w-[50px] bg-gray-200 text-gray-800 rounded px-1 py-1"
+              onClick={handleCloseModal}
+            >
+              ok
+            </button>
+          </div>
+        </div>
+      )}
+     
       {cancelModal && (
         <div className="fixed inset-0 p-4 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          {showModal && (
-            <div
-              className={`absolute top-10 text-xs z-50  left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-out ${
-                modalType === "success"
-                  ? "bg-green-100 text-green-800 border border-green-300 rounded-lg p-1 animate-slide-in"
-                  : "bg-red-100 text-red-800 border border-red-300 rounded-lg p-1 animate-slide-in"
-              }`}
-            >
-              <div className="modal-message">
-                <p>{modalMessage}</p>
-              </div>
-            </div>
-          )}
+         
 
           <div className="bg-[#252525] rounded-lg flex flex-col items-center justify-center gap-1 shadow-lg p-6 w-96">
             <div className="flex  w-full justify-between ">

@@ -43,6 +43,11 @@ export  const convertExpiryDate = (expiry) => {
 };
 
 
+export   const convertTime = (timestamp) => {
+  const date = new Date(Number(timestamp)/1e6);
+  return date.toLocaleString(); // Adjust options as needed
+};
+
 export const traitsData = [
   {
     trait: "Background",
