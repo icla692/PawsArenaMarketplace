@@ -1,0 +1,85 @@
+type _anon_class_17_1 = 
+ service {
+   accept_offer: (text, nat32) -> (Response);
+   buy_nft: (text) -> (Response);
+   claim_nft: (text) -> (text);
+   complete_listing: (principal, nat, NFT_CATEGORY) -> (Response);
+   get_all_listed_nfts: () -> (Response_4) query;
+   get_all_user_listed_nfts: (principal) -> (Response_3) query;
+   get_listed_nft_details: (text) -> (Response_2) query;
+   get_nft_sale_history: (text) -> (Response_1) query;
+   init_list_nft: (principal, nat, NFT_CATEGORY, nat) -> (Response);
+   place_offer_on_nft: (text, nat, int) -> (Response);
+   salesTransactions: () -> (Response_1) query;
+   un_list_nft: (text) -> (Response);
+   update_nft_price: (text, nat) -> (Response);
+ };
+type SaleTransactions = 
+ record {
+   buyer: principal;
+   price: nat64;
+   seller: principal;
+   time: int;
+   token: text;
+ };
+type Response_4 = 
+ record {
+   data: opt vec record {
+                   text;
+                   ListedNFTData;
+                 };
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response_3 = 
+ record {
+   data: opt vec ListedNFTData;
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response_2 = 
+ record {
+   data: opt ListedNFTData;
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response_1 = 
+ record {
+   data: opt vec SaleTransactions;
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type Response = 
+ record {
+   data: opt text;
+   error_text: opt text;
+   status: nat16;
+   status_text: text;
+ };
+type OfferData = 
+ record {
+   amount: nat;
+   expiry_date: int;
+   offer_id: nat32;
+   user: principal;
+ };
+type NFT_CATEGORY__1 = variant {Kitties;};
+type NFT_CATEGORY = variant {Kitties;};
+type ListedNFTData = 
+ record {
+   date_of_listing: int;
+   isConfirmed: bool;
+   nft_canister: text;
+   nft_category: NFT_CATEGORY__1;
+   nft_id: nat32;
+   nft_price: nat;
+   offers: vec OfferData;
+   seller_identifier: text;
+   seller_principal: principal;
+   token_identifier: text;
+ };
+service : () -> _anon_class_17_1

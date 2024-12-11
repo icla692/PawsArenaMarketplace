@@ -69,6 +69,11 @@ export const idlFactory = ({ IDL }) => {
         [Response],
         [],
       ),
+    'transferNftMarketplace' : IDL.Func(
+        [IDL.Principal, IDL.Text, NFT_CATEGORY],
+        [IDL.Bool],
+        [],
+      ),
     'un_list_nft' : IDL.Func([IDL.Text], [Response], []),
     'update_nft_price' : IDL.Func([IDL.Text, IDL.Nat], [Response], []),
   });

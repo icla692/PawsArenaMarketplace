@@ -59,6 +59,10 @@ export interface _anon_class_15_1 {
     Response
   >,
   'place_offer_on_nft' : ActorMethod<[string, bigint, bigint], Response>,
+  'transferNftMarketplace' : ActorMethod<
+    [Principal, string, NFT_CATEGORY],
+    boolean
+  >,
   'un_list_nft' : ActorMethod<[string], Response>,
   'update_nft_price' : ActorMethod<[string, bigint], Response>,
 }
